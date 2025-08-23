@@ -1,0 +1,59 @@
+[tool.poetry]
+name = "l0-s3-1"
+version = "0.1.0"
+description = "L0-S3-1: NumPy + محیط حرفه‌ای (Poetry, QA, pre-commit)"
+authors = ["Iman <you@example.com>"]
+readme = "README.md"
+packages = [{ include = "l0_s3_1", from = "src" }]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+numpy = "^2.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.0"
+ruff = "^0.6"
+mypy = "^1.10"
+pytest = "^8.0"
+pytest-cov = "^5.0"
+pre-commit = "^3.8"
+typing-extensions = "^4.12"
+
+[tool.black]
+line-length = 100
+target-version = ["py311", "py312"]
+preview = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src"]
+
+[tool.ruff.lint]
+ignore = ["E203"]
+select = ["E", "F", "W", "I"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unreachable = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+no_implicit_optional = true
+plugins = []
+mypy_path = "src"
+explicit_package_bases = true
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-q --cov=src --cov-report=term-missing"
+testpaths = ["tests"]
+
+[tool.poetry.scripts]
+l0s3 = "l0_s3_1.cli:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
