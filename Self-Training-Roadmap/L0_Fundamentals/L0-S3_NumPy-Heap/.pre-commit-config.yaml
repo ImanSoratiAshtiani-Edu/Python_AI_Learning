@@ -1,4 +1,11 @@
 repos:
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: poetry run pytest tests -v
+        language: system
+        types: [python]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.9
     hooks:
