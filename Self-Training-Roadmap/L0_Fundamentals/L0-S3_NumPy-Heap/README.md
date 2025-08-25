@@ -1,6 +1,10 @@
 # L0-S3-1
 
-پروژه‌ی تمرین NumPy با محیط حرفه‌ای: Poetry، QA tools، pre-commit.
+پروژه NumPy تمرین‌های
+
+فایل‌ها: ex01, ex02, ex03
+
+دستور اجرای تست‌ها (poetry run pytest)
 
 ## Quickstart
 
