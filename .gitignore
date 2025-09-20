@@ -11,4 +11,5 @@ build/
 .cache/
 .ipynb_checkpoints/
 .mypy_cache/
+~*
 *NotGit*
