@@ -62,3 +62,7 @@ Thumbs.db
 *.bak
 
 # توضیح: این فایل برای پروژه‌های پایتونی با Poetry و پروژه‌های آموزشی ML/DL مناسب است.
+*.toml
+*.yaml
+.git\
+.gitignore
