@@ -97,33 +97,64 @@
         <div class="mt-3 text-xs text-slate-500 dark:text-slate-400" id="searchHelp">Tip: Combine text + operators like <code class="px-1 rounded bg-slate-200/60 dark:bg-slate-800">deep-learning tag:vision site:arxiv.org</code></div>
       </section>
 
-      <!-- Featured row -->
-      <section id="featured" class="mb-6">
-        <h2 class="font-bold text-lg mb-3" data-i18n="featuredTitle">Featured</h2>
-        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <a data-ft="hf" target="_blank" rel="noopener" class="smooth rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 p-4 flex items-center gap-3 hover:shadow-glow">
-            <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 grid place-items-center">🤗</div>
-            <div class="min-w-0">
-              <div class="font-bold truncate">Hugging Face Docs</div>
-              <div class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">Transformers, Datasets, Hub — production ML tooling.</div>
-            </div>
-          </a>
-          <a data-ft="colab" target="_blank" rel="noopener" class="smooth rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 p-4 flex items-center gap-3 hover:shadow-glow">
-            <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 grid place-items-center">📓</div>
-            <div class="min-w-0">
-              <div class="font-bold truncate">Google Colab</div>
-              <div class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">Fast notebooks in the cloud; great for quick experiments.</div>
-            </div>
-          </a>
-          <a data-ft="sklearn" target="_blank" rel="noopener" class="smooth rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 p-4 flex items-center gap-3 hover:shadow-glow">
-            <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 grid place-items-center">🔧</div>
-            <div class="min-w-0">
-              <div class="font-bold truncate">scikit‑learn User Guide</div>
-              <div class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">Clean API for classical ML; pipelines, model selection, metrics.</div>
-            </div>
-          </a>
+      <!-- Featured (new) -->
+<section id="featured" class="mt-8">
+  <h2 class="text-lg font-bold mb-3" data-i18n="featuredTitle">Featured</h2>
+  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <!-- Google Colab -->
+    <article class="card smooth rounded-2xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold">Google Colab</h3>
+        <span class="badge">Platform</span>
+      </div>
+      <p class="text-sm text-slate-600 dark:text-slate-300">Run notebooks in the cloud with GPUs.</p>
+      <a href="https://colab.research.google.com" target="_blank" rel="noopener"
+         class="text-cyan-600 dark:text-cyan-400 hover:underline text-sm">Open ↗</a>
+    </article>
+
+    <!-- GitHub -->
+    <article class="card smooth rounded-2xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold">GitHub</h3>
+        <span class="badge">Platform</span>
+      </div>
+      <p class="text-sm text-slate-600 dark:text-slate-300">Host code, branches, and GitHub Pages.</p>
+      <a href="https://github.com" target="_blank" rel="noopener"
+         class="text-cyan-600 dark:text-cyan-400 hover:underline text-sm">Open ↗</a>
+    </article>
+
+    <!-- Books List (from books.json) -->
+    <article id="featured-books" class="card smooth rounded-2xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-2 cursor-pointer">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold">Books List</h3>
+        <span class="badge">JSON</span>
+      </div>
+      <p class="text-sm text-slate-600 dark:text-slate-300">Browse curated books (from books.json).</p>
+      <button class="text-cyan-600 dark:text-cyan-400 hover:underline text-sm text-left">Open list</button>
+    </article>
+
+    <!-- Ebooks (from ebooks.json) -->
+    <article id="featured-ebooks" class="card smooth rounded-2xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-2 cursor-pointer">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold">Ebooks</h3>
+        <span class="badge">JSON</span>
+      </div>
+      <p class="text-sm text-slate-600 dark:text-slate-300">Open PDFs with rich metadata (from ebooks.json).</p>
+      <button class="text-cyan-600 dark:text-cyan-400 hover:underline text-sm text-left">Open list</button>
+    </article>
+  </div>
+  <!-- Modal: List Viewer -->
+    <div id="listModal" class="fixed inset-0 hidden place-items-center">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 max-w-3xl w-[92%] p-6 max-h-[80vh] overflow-auto">
+        <div class="flex items-start justify-between gap-3 mb-3">
+          <h3 id="listTitle" class="font-extrabold text-lg">List</h3>
+          <button id="listClose" class="px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700">✕</button>
         </div>
-      </section>
+        <div id="listContainer" class="grid gap-3"></div>
+      </div>
+    </div>
+</section>
+
 
       <!-- Results info -->
       <div id="resultInfo" class="text-xs text-slate-500 dark:text-slate-400 mb-2">—</div>
@@ -533,14 +564,87 @@
         setLang(state.lang);
         $('#langBtn').addEventListener('click', ()=> setLang(state.lang==='fa'?'en':'fa'));
 
-        // Featured links hrefs
-        const FT = {
-          hf: 'https://huggingface.co/docs',
-          colab: 'https://colab.research.google.com/',
-          sklearn: 'https://scikit-learn.org/stable/user_guide.html'
-        }
+        
         $$('[data-ft]').forEach(a=> a.href = FT[a.dataset.ft]);
       });
     </script>
+      // ---- helpers (if not defined elsewhere) ----
+    <script>
+      async function getJSON(url){
+        try{ const r = await fetch(url, { cache: 'no-store' }); if(!r.ok) return null; return await r.json(); }
+        catch{ return null }
+      }
+      function showListModal(title, items, type){
+        const modal = document.getElementById('listModal');
+        const cont  = document.getElementById('listContainer');
+        document.getElementById('listTitle').textContent = title;
+        cont.innerHTML = '';
+
+        if(!Array.isArray(items) || !items.length){
+          cont.innerHTML = '<div class="text-xs text-slate-500 dark:text-slate-400">No items found.</div>';
+        } else {
+          items.forEach((it)=>{
+            const box = document.createElement('div');
+            box.className = 'rounded-xl border border-slate-200 dark:border-slate-800 p-4';
+
+            const h = document.createElement('div');
+            h.className = 'font-bold';
+            h.textContent = it.title || '(No title)';
+            box.appendChild(h);
+
+            const meta = [
+              ['Authors',   it.authors],
+              ['Publisher', it.publisher],
+              ['Edition',   it.edition],
+              ['Category',  it.category],
+              ['Language',  it.language],
+              ['Level',     it.level],
+            ];
+            const dl = document.createElement('dl');
+            dl.className = 'grid sm:grid-cols-2 gap-x-6 gap-y-1 text-sm mt-2';
+            meta.forEach(([k, v])=>{
+              if(!v) return;
+              const dt = document.createElement('dt'); dt.className='text-slate-500 dark:text-slate-400'; dt.textContent=k+':';
+              const dd = document.createElement('dd'); dd.textContent = Array.isArray(v) ? v.join(', ') : v;
+              dl.appendChild(dt); dl.appendChild(dd);
+            });
+            box.appendChild(dl);
+
+            if (type === 'ebooks' && it.link){
+              const a = document.createElement('a');
+              a.href = it.link; a.target = '_blank'; a.rel = 'noopener';
+              a.className = 'inline-block mt-3 text-cyan-600 dark:text-cyan-400 hover:underline text-sm';
+              a.textContent = 'Open PDF ↗';
+              box.appendChild(a);
+            }
+
+            cont.appendChild(box);
+          });
+        }
+        modal.classList.remove('hidden');
+      }
+      document.getElementById('listClose')?.addEventListener('click', ()=> document.getElementById('listModal').classList.add('hidden'));
+      document.getElementById('listModal')?.addEventListener('click', (e)=>{ if(e.target.id==='listModal') e.currentTarget.classList.add('hidden'); });
+
+      // ---- Featured handlers ----
+      document.getElementById('featured-books')?.addEventListener('click', async ()=>{
+        const data = await getJSON('books.json');  // title, authors, publisher, edition, category, language, level
+        showListModal('Books List', data||[], 'books');
+      });
+      document.getElementById('featured-ebooks')?.addEventListener('click', async ()=>{
+        const data = await getJSON('ebooks.json'); // + link
+        showListModal('Ebooks', data||[], 'ebooks');
+      });
+    </script>
+    <!-- List Modal (for featured) -->
+    <div id="listModal" class="modal hidden">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 max-w-3xl w-[92%] p-6 max-h-[80vh] overflow-y-auto">
+        <div class="flex items-start justify-between gap-3 mb-3">
+          <h3 id="listTitle" class="font-extrabold text-lg"></h3>
+          <button id="listClose" class="px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700">✕</button>
+        </div>
+        <div id="listContainer" class="grid gap-4"></div>
+      </div>
+    </div>  
   </body>
 </html>
