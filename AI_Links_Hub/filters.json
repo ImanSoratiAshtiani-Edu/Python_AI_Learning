@@ -1,0 +1,8 @@
+[
+  {"id":"ai","label":"AI / ML"},
+  {"id":"python","label":"Python"},
+  {"id":"data","label":"Data / Viz"},
+  {"id":"papers","label":"Papers"},
+  {"id":"tools","label":"Tools"},
+  {"id":"career","label":"Career"}
+]
