@@ -84,15 +84,15 @@
             <input id="search" type="search" placeholder="Search title, description, tag or domain… (use tag:vision site:arxiv.org)" class="w-full rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-cyan-500/40">
             <span class="absolute right-3 top-2.5 text-slate-400">🔎</span>
           </div>
-          <div class="flex items-center gap-2 overflow-x-auto">
-            <button data-cat="all" class="tab smooth px-3 py-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-sm">All</button>
-            <button data-cat="ai" class="tab smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm">AI / ML</button>
-            <button data-cat="data" class="tab smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm">Data / Viz</button>
-            <button data-cat="python" class="tab smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm">Python</button>
-            <button data-cat="papers" class="tab smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm">Papers</button>
-            <button data-cat="tools" class="tab smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm">Tools</button>
-            <button data-cat="career" class="tab smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm">Career</button>
+          <!-- Category dropdown (replaces the button row) -->
+          <div class="flex items-center gap-2">
+            <label for="categorySelect" class="text-xs text-slate-500 dark:text-slate-400">Category:</label>
+            <select id="categorySelect"
+                    class="rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-3 py-2">
+              <!-- options will be populated from filters.json + defaults -->
+            </select>
           </div>
+
         </div>
         <div class="mt-3 text-xs text-slate-500 dark:text-slate-400" id="searchHelp">Tip: Combine text + operators like <code class="px-1 rounded bg-slate-200/60 dark:bg-slate-800">deep-learning tag:vision site:arxiv.org</code></div>
       </section>
@@ -350,6 +350,62 @@
           return j;
         } catch { return null }
       }
+      // -------- Category source (from filters.json with fallback) --------
+        const DEFAULT_CATEGORIES = [
+          { id: 'ai',     label: 'AI / ML' },
+          { id: 'python', label: 'Python' },
+          { id: 'data',   label: 'Data / Viz' },
+          { id: 'papers', label: 'Papers' },
+          { id: 'tools',  label: 'Tools' },
+          { id: 'career', label: 'Career' },
+        ];
+
+        async function loadCategoriesFromJSON() {
+          try {
+            const res = await fetch('filters.json', { cache: 'no-store' });
+            if (!res.ok) throw new Error('no filters.json');
+            const j = await res.json();
+            // normalize: accept array of strings or array of {id,label}
+            const arr = Array.isArray(j) ? j : [];
+            return arr.map(x => {
+              if (typeof x === 'string') return { id: x, label: x[0].toUpperCase() + x.slice(1) };
+              if (x && typeof x.id === 'string') return { id: x.id, label: x.label || x.id };
+              return null;
+            }).filter(Boolean);
+          } catch {
+            return DEFAULT_CATEGORIES;
+          }
+        }
+
+        // Populate <select id="categorySelect">
+        async function initCategoryDropdown() {
+          const select = document.getElementById('categorySelect');
+          if (!select) return;
+          const cats = await loadCategoriesFromJSON();
+          // Add "All" first
+          select.innerHTML = '';
+          const optAll = document.createElement('option');
+          optAll.value = 'all';
+          optAll.textContent = 'All';
+          select.appendChild(optAll);
+          // Add categories
+          cats.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = c.label;
+            select.appendChild(opt);
+          });
+          // set current value
+          select.value = (state.category && (state.category === 'all' || cats.some(c => c.id === state.category)))
+            ? state.category : 'all';
+          // on change
+          select.addEventListener('change', () => {
+            state.category = select.value;
+            setHash({ cat: state.category });  // حفظ در URL
+            render();
+          });
+        }
+
 
       // ---------------- State ----------------
       let state = { data: [], query: '', category: 'all', route: 'links', lang: localStorage.getItem('ai-lang')||'en' };
@@ -400,11 +456,7 @@
         }
         $('#resultInfo').textContent = (dict.count||I18N.en.count)(filtered.length, activeCat, state.query);
 
-        // Category tab active state
-        $$('.tab').forEach(btn=>{
-          if (btn.dataset.cat===activeCat){ btn.classList.add('bg-slate-900','text-white','dark:bg-white','dark:text-slate-900'); btn.classList.remove('border'); }
-          else { btn.classList.remove('bg-slate-900','text-white','dark:bg-white','dark:text-slate-900'); btn.classList.add('border'); }
-        })
+        
       }
 
       function openAbout(item){
@@ -440,7 +492,7 @@
 
         // Wire controls
         $('#search').addEventListener('input', e=>{ state.query=e.target.value; setHash({ q: state.query }); render(); });
-        $$('.tab').forEach(btn=> btn.addEventListener('click', ()=>{ state.category = btn.dataset.cat; setHash({ cat: state.category }); render(); }));
+        await initCategoryDropdown();
         $$('.route-btn').forEach(btn=> btn.addEventListener('click', ()=>{ state.route = btn.dataset.route; setHash({ route: state.route, q: state.query, cat: state.category }); render(); }));
         addEventListener('hashchange', ()=>{ const h=parseHash(); state.query=h.q; state.category=h.cat; state.route=h.route; $('#search').value = state.query; render(); });
 
