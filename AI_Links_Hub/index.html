@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Links Hub | Your Curated AI/ML Library</title>
+    <meta name="description" content="A minimal, elegant single‑page hub to collect and categorize helpful AI/ML/Data links with search, tags, routing, i18n, and JSON sync." />
+    <meta property="og:title" content="AI Links Hub" />
+    <meta property="og:description" content="All my AI/ML/Data resources in one place." />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#0ea5e9" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100  100'><rect width='100' height='100' rx='22' fill='%230ea5e9'/><text x='50' y='58' text-anchor='middle' font-size='54' fill='white'>AI</text></svg>">
+
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'Vazirmatn', 'ui-sans-serif', 'system-ui'] },
+            backgroundImage: {
+              grid: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0)',
+            },
+            boxShadow: {
+              glow: '0 0 1px rgba(34,211,238,.6), 0 0 24px rgba(14,165,233,.25)'
+            }
+          },
+        },
+      }
+    </script>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Vazirmatn:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+      .glass { backdrop-filter: blur(10px); background: rgba(255,255,255,.08); }
+      .dark .glass { background: rgba(255,255,255,.05); }
+      .card:hover { transform: translateY(-2px); }
+      .smooth { transition: all .2s ease; }
+      ::-webkit-scrollbar { width: 10px; height: 10px; }
+      ::-webkit-scrollbar-thumb { background: rgba(100,116,139,.5); border-radius: 10px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      .pill { font-size:10px; padding:.35rem .6rem; border-radius:9999px }
+      details > summary { cursor:pointer }
+      .modal { position: fixed; inset: 0; display:none; }
+      .modal[data-open="true"] { display: grid; place-items: center; }
+    </style>
+  </head>
+  <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen selection:bg-cyan-300/40 selection:text-slate-900">
+    <!-- Background aesthetics -->
+    <div class="pointer-events-none fixed inset-0 -z-10">
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-500/10 via-indigo-500/5 to-transparent"></div>
+      <div class="absolute inset-0 bg-grid bg-[length:22px_22px]"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+      <!-- Header / Nav -->
+      <header class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-cyan-500 text-white grid place-items-center font-extrabold shadow-glow">AI</div>
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">AI Links Hub</h1>
+            <p id="subtitle" class="text-sm text-slate-600 dark:text-slate-400 mt-1">A personal library of helpful links; with search, tags & categories.</p>
+          </div>
+        </div>
+        <nav class="flex items-center gap-2">
+          <button data-route="links" class="route-btn smooth px-3 py-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-sm">Links</button>
+          <button data-route="guide" class="route-btn smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm">Guide</button>
+          <button id="langBtn" class="smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm" title="Toggle language">FA / EN</button>
+          <button id="exportBtn" class="smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm">Export JSON</button>
+          <button id="importBtn" class="smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm">Import JSON</button>
+          <input id="importInput" type="file" accept="application/json" class="hidden" />
+          <button id="modeBtn" class="smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm" title="Dark/Light">🌓</button>
+          <a href="#add" class="smooth px-3 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-600 text-white text-sm">+ Add</a>
+        </nav>
+      </header>
+
+      <!-- Controls (Links route only) -->
+      <section id="controls" class="glass rounded-2xl p-4 border border-slate-200/40 dark:border-white/5 mb-6">
+        <div class="flex flex-col md:flex-row gap-3 md:items-center">
+          <div class="relative flex-1">
+            <input id="search" type="search" placeholder="Search title, description, tag or domain… (use tag:vision site:arxiv.org)" class="w-full rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-cyan-500/40">
+            <span class="absolute right-3 top-2.5 text-slate-400">🔎</span>
+          </div>
+          <div class="flex items-center gap-2 overflow-x-auto">
+            <button data-cat="all" class="tab smooth px-3 py-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-sm">All</button>
+            <button data-cat="ai" class="tab smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm">AI / ML</button>
+            <button data-cat="data" class="tab smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm">Data / Viz</button>
+            <button data-cat="python" class="tab smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm">Python</button>
+            <button data-cat="papers" class="tab smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm">Papers</button>
+            <button data-cat="tools" class="tab smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm">Tools</button>
+            <button data-cat="career" class="tab smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm">Career</button>
+          </div>
+        </div>
+        <div class="mt-3 text-xs text-slate-500 dark:text-slate-400" id="searchHelp">Tip: Combine text + operators like <code class="px-1 rounded bg-slate-200/60 dark:bg-slate-800">deep-learning tag:vision site:arxiv.org</code></div>
+      </section>
+
+      <!-- Featured row -->
+      <section id="featured" class="mb-6">
+        <h2 class="font-bold text-lg mb-3" data-i18n="featuredTitle">Featured</h2>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <a data-ft="hf" target="_blank" rel="noopener" class="smooth rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 p-4 flex items-center gap-3 hover:shadow-glow">
+            <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 grid place-items-center">🤗</div>
+            <div class="min-w-0">
+              <div class="font-bold truncate">Hugging Face Docs</div>
+              <div class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">Transformers, Datasets, Hub — production ML tooling.</div>
+            </div>
+          </a>
+          <a data-ft="colab" target="_blank" rel="noopener" class="smooth rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 p-4 flex items-center gap-3 hover:shadow-glow">
+            <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 grid place-items-center">📓</div>
+            <div class="min-w-0">
+              <div class="font-bold truncate">Google Colab</div>
+              <div class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">Fast notebooks in the cloud; great for quick experiments.</div>
+            </div>
+          </a>
+          <a data-ft="sklearn" target="_blank" rel="noopener" class="smooth rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 p-4 flex items-center gap-3 hover:shadow-glow">
+            <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 grid place-items-center">🔧</div>
+            <div class="min-w-0">
+              <div class="font-bold truncate">scikit‑learn User Guide</div>
+              <div class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">Clean API for classical ML; pipelines, model selection, metrics.</div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Results info -->
+      <div id="resultInfo" class="text-xs text-slate-500 dark:text-slate-400 mb-2">—</div>
+
+      <!-- Links grid -->
+      <main id="grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></main>
+
+      <!-- Add new link -->
+      <section id="add" class="mt-10 glass rounded-2xl p-5 border border-slate-200/40 dark:border-white/5">
+        <h2 class="font-bold text-lg mb-3" data-i18n="addTitle">Add a link</h2>
+        <form id="addForm" class="grid sm:grid-cols-2 gap-3">
+          <input name="title" required placeholder="Title" class="rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-4 py-3" />
+          <input name="url" required type="url" placeholder="URL (https://…)" class="rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-4 py-3" />
+          <input name="desc" placeholder="Short description" class="rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-4 py-3 sm:col-span-2" />
+          <div class="sm:col-span-2 grid grid-cols-2 gap-3">
+            <select name="category" class="rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-4 py-3">
+              <option value="ai">AI / ML</option>
+              <option value="data">Data / Viz</option>
+              <option value="python">Python</option>
+              <option value="papers">Papers</option>
+              <option value="tools">Tools</option>
+              <option value="career">Career</option>
+            </select>
+            <input name="tags" placeholder="Tags (comma‑separated)" class="rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-4 py-3" />
+          </div>
+          <button class="smooth mt-1 sm:col-span-2 px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white">Save to LocalStorage</button>
+        </form>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-3" id="storageNote">Data is stored in your browser. Use Export to back up JSON and keep it in Git.</p>
+      </section>
+
+      <!-- Guide route -->
+      <section id="guide" class="hidden mt-6 glass rounded-2xl p-5 border border-slate-200/40 dark:border-white/5 leading-7">
+        <h2 class="text-xl font-extrabold mb-2" data-i18n="guideTitle">How to use this hub</h2>
+        <ol class="list-decimal pl-6 space-y-1 text-sm">
+          <li><b>Add links</b> via the form. Fields: Title, URL, Description, Category, Tags.</li>
+          <li><b>Search</b> supports text + operators: <code>tag:vision</code>, <code>site:arxiv.org</code>.</li>
+          <li><b>Categories</b> filter by topic. Combine with search.</li>
+          <li><b>Export/Import JSON</b> to sync via your Git repo. The app can also <b>fetch ai-links.json</b> from the same repo automatically.</li>
+          <li><b>Routing</b>: current filters are reflected in the URL hash (shareable).</li>
+          <li><b>About</b>: each card has an "About" link — click to view extra notes & helpful sublinks.</li>
+          <li><b>Language</b>: toggle FA/EN from the header. EN is default.</li>
+          <li><b>Dark/Light</b>: toggle from the header; preference is saved.</li>
+          <li><b>Deploy</b> on <b>GitHub Pages</b>: put this file as <code>index.html</code> in your repo → Settings → Pages → Deploy from a branch.</li>
+        </ol>
+        <h3 class="font-bold mt-4 mb-2" data-i18n="guideSync">Syncing with GitHub (JSON)</h3>
+        <p class="text-sm">Place a file named <code>ai-links.json</code> in your repo root. On load, the app will try to fetch it and merge with LocalStorage. Use the button below to export a timestamped JSON ready to commit.</p>
+        <div class="mt-3 flex gap-2">
+          <button id="exportGitBtn" class="smooth px-3 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-600 text-white text-sm">Export JSON for Git</button>
+          <a id="ghHowTo" class="smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm" href="https://docs.github.com/pages" target="_blank" rel="noopener">Read: GitHub Pages</a>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="mt-10 text-center text-xs text-slate-500 dark:text-slate-400">
+        Designed for AI learners — Minimal, glassy, and keyboard‑friendly.
+      </footer>
+    </div>
+
+    <!-- Card template & About modal -->
+    <template id="cardTemplate">
+      <article class="card smooth rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 p-4 flex flex-col gap-3">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h3 class="title font-bold leading-tight truncate"></h3>
+            <p class="desc text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mt-1"></p>
+          </div>
+          <div class="shrink-0 w-9 h-9 rounded-xl grid place-items-center bg-slate-100 dark:bg-slate-800 text-lg">🔗</div>
+        </div>
+        <div class="flex flex-wrap gap-1 tags"></div>
+        <div class="flex items-center justify-between pt-2">
+          <a class="url smooth text-cyan-600 dark:text-cyan-400 hover:underline text-sm break-all" target="_blank" rel="noopener">Open ↗</a>
+          <div class="text-[10px] text-slate-500 dark:text-slate-400 domain"></div>
+        </div>
+        <div class="flex items-center justify-between">
+          <a class="about smooth text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 cursor-pointer">About</a>
+        </div>
+      </article>
+    </template>
+
+    <div id="aboutModal" class="modal">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 max-w-2xl w-[92%] p-6">
+        <div class="flex items-start justify-between gap-3 mb-3">
+          <h3 id="aboutTitle" class="font-extrabold text-lg"></h3>
+          <button id="aboutClose" class="px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700">✕</button>
+        </div>
+        <p id="aboutDesc" class="text-sm text-slate-600 dark:text-slate-300 mb-3"></p>
+        <div id="aboutLinks" class="grid gap-2"></div>
+      </div>
+    </div>
+
+    <script>
+      // ---------------- I18N ----------------
+      const I18N = {
+        en: {
+          subtitle: 'A personal library of helpful links; with search, tags & categories.',
+          searchPlaceholder: 'Search title, description, tag or domain… (use tag:vision site:arxiv.org)',
+          tip: 'Tip: Combine text + operators like ',
+          featuredTitle: 'Featured',
+          addTitle: 'Add a link',
+          storageNote: 'Data is stored in your browser. Use Export to back up JSON and keep it in Git.',
+          guideTitle: 'How to use this hub',
+          guideSync: 'Syncing with GitHub (JSON)',
+          open: 'Open', about: 'About', links: 'Links', guide: 'Guide',
+          count: (n, cat, q)=> `${n} results${cat!=='all'?` — category: ${cat}`:''}${q?` — query: “${q}”`:''}`,
+        },
+        fa: {
+          subtitle: 'کتابخانه‌ای شخصی از لینک‌های مفید با جست‌وجو، تگ و دسته‌ها.',
+          searchPlaceholder: 'جست‌وجوی عنوان، توضیح، تگ یا دامنه… (مثال: tag:vision site:arxiv.org)',
+          tip: 'نکته: می‌توانی متن + عملگرها را ترکیب کنی مثل ',
+          featuredTitle: 'ویژه',
+          addTitle: 'افزودن لینک',
+          storageNote: 'داده‌ها در مرورگر شما ذخیره می‌شود. با Export نسخهٔ JSON بگیرید و در Git نگه دارید.',
+          guideTitle: 'راهنمای استفاده',
+          guideSync: 'همگام‌سازی با گیت‌هاب (JSON)',
+          open: 'باز کردن', about: 'درباره', links: 'لینک‌ها', guide: 'راهنما',
+          count: (n, cat, q)=> `${n} لینک نمایش داده شد${cat!=='all'?` — دسته: ${cat}`:''}${q?` — جست‌وجو: “${q}”`:''}`,
+        }
+      }
+
+      function setLang(lang){
+        const dict = I18N[lang] || I18N.en;
+        document.getElementById('subtitle').textContent = dict.subtitle;
+        document.getElementById('search').placeholder = dict.searchPlaceholder;
+        document.getElementById('searchHelp').innerHTML = dict.tip + `<code class="px-1 rounded bg-slate-200/60 dark:bg-slate-800">deep-learning tag:vision site:arxiv.org</code>`;
+        document.querySelector('[data-i18n="featuredTitle"]').textContent = dict.featuredTitle;
+        document.querySelector('[data-i18n="addTitle"]').textContent = dict.addTitle;
+        document.getElementById('storageNote').textContent = dict.storageNote;
+        document.querySelector('[data-i18n="guideTitle"]').textContent = dict.guideTitle;
+        document.querySelector('[data-i18n="guideSync"]').textContent = dict.guideSync;
+        // Tabs labels
+        document.querySelector('[data-route="links"]').textContent = dict.links;
+        document.querySelector('[data-route="guide"]').textContent = dict.guide;
+        // Direction
+        document.documentElement.lang = lang === 'fa' ? 'fa' : 'en';
+        document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+        localStorage.setItem('ai-lang', lang);
+        state.lang = lang;
+        render();
+      }
+
+      // --------------- Seed / Catalog ----------------
+      const seedLinks = [
+        { title: 'scikit-learn User Guide', url: 'https://scikit-learn.org/stable/user_guide.html', desc: 'Complete guide with practical examples.', category: 'ai', tags: ['ml','python','guide'], about: {
+            notes: 'Great for classical ML, pipelines, preprocessing, and evaluation.',
+            links: [
+              { label: 'API Reference', url: 'https://scikit-learn.org/stable/modules/classes.html' },
+              { label: 'Model Evaluation', url: 'https://scikit-learn.org/stable/modules/model_evaluation.html' }
+            ]}},
+        { title: 'NumPy Documentation', url: 'https://numpy.org/doc/stable/', desc: 'Arrays, broadcasting and performance.', category: 'python', tags: ['numpy','arrays','performance'], about: {
+            notes: 'Foundation for scientific Python; focus on shapes, dtypes, and vectorization.',
+            links: [
+              { label: 'User Guide', url: 'https://numpy.org/doc/stable/user/index.html' },
+              { label: 'Broadcasting', url: 'https://numpy.org/doc/stable/user/basics.broadcasting.html' }
+            ]}},
+        { title: 'Pandas User Guide', url: 'https://pandas.pydata.org/docs/user_guide/index.html', desc: 'DataFrames, IO, indexing, time series.', category: 'data', tags: ['pandas','dataframe','io'], about: {
+            notes: 'Learn selection with .loc/.iloc, groupby, and joins for analysis workflows.',
+            links: [
+              { label: 'Indexing', url: 'https://pandas.pydata.org/docs/user_guide/indexing.html' },
+              { label: 'Groupby', url: 'https://pandas.pydata.org/docs/user_guide/groupby.html' }
+            ]}},
+        { title: 'arXiv: cs.LG (recent)', url: 'https://arxiv.org/list/cs.LG/recent', desc: 'Latest ML research preprints.', category: 'papers', tags: ['arxiv','research','ml'], about: {
+            notes: 'Track trends and new methods; read abstracts to shortlist.',
+            links: [ { label: 'arXiv search: vision', url: 'https://arxiv.org/search/?query=vision&searchtype=all&source=header' } ] }},
+        { title: 'Weights & Biases', url: 'https://wandb.ai/', desc: 'Experiment tracking and dashboards.', category: 'tools', tags: ['mlops','exp-tracking'], about: {
+            notes: 'Log metrics/artifacts, compare runs, share results, and collaborate.',
+            links: [ { label: 'W&B Docs', url: 'https://docs.wandb.ai/' } ] }},
+        { title: 'Awesome Machine Learning', url: 'https://github.com/josephmisiti/awesome-machine-learning', desc: 'Curated ML resources list.', category: 'ai', tags: ['awesome','curation'], about: {
+            notes: 'A broad catalog; scan by language and domain.',
+            links: [ { label: 'Contribute Guide', url: 'https://github.com/josephmisiti/awesome-machine-learning#contributing' } ] }},
+        { title: 'Matplotlib Tutorials', url: 'https://matplotlib.org/stable/tutorials/', desc: 'Plotting fundamentals and beyond.', category: 'data', tags: ['viz','matplotlib'], about: {
+            notes: 'Understand figures/axes; practice consistent styling and labeling.',
+            links: [ { label: 'Gallery', url: 'https://matplotlib.org/stable/gallery/index.html' } ] }},
+        { title: 'Eugeneyan.com — ML System Design', url: 'https://eugeneyan.com/writing/', desc: 'Production ML, data & engineering essays.', category: 'career', tags: ['career','system-design'], about: {
+            notes: 'Industry‑grade writings for designing robust ML systems.',
+            links: [ { label: 'Recommended Reads', url: 'https://eugeneyan.com/tags/' } ] }},
+        { title: 'PyTorch Docs', url: 'https://pytorch.org/docs/stable/index.html', desc: 'Deep learning framework docs.', category: 'ai', tags: ['pytorch','dl','autograd'], about: { notes: 'Great tutorials and nn modules; check TorchVision for vision.', links:[{label:'TorchVision', url:'https://pytorch.org/vision/stable/index.html'}]}},
+        { title: 'TensorFlow Guide', url: 'https://www.tensorflow.org/guide', desc: 'Comprehensive TF guide.', category: 'ai', tags: ['tensorflow','dl'], about: { notes:'Keras high‑level API; look at tf.data and SavedModel.', links:[{label:'Keras Docs', url:'https://keras.io/'}]}},
+        { title: 'SciPy Docs', url: 'https://docs.scipy.org/doc/scipy/', desc: 'Algorithms for scientific computing.', category: 'python', tags: ['scipy','opt','signal'], about: { notes:'Optimization, stats, signal processing; complements NumPy.', links:[{label:'Tutorial', url:'https://docs.scipy.org/doc/scipy/tutorial/'}]}},
+        { title: 'Seaborn Tutorials', url: 'https://seaborn.pydata.org/tutorial.html', desc: 'Statistical data visualization.', category: 'data', tags: ['seaborn','viz'], about: { notes:'High‑level charts over Matplotlib; explore FacetGrid & catplot.', links:[{label:'Gallery', url:'https://seaborn.pydata.org/examples/index.html'}]}},
+        { title: 'statsmodels Docs', url: 'https://www.statsmodels.org/stable/', desc: 'Classical statistics & econometrics.', category: 'ai', tags: ['stats','time-series'], about: { notes:'GLM, ARIMA, and inference tools with summaries.', links:[{label:'Examples', url:'https://www.statsmodels.org/stable/examples/index.html'}]}},
+        { title: 'Kaggle Learn', url: 'https://www.kaggle.com/learn', desc: 'Short hands‑on courses.', category: 'career', tags: ['kaggle','learn'], about: { notes:'Practical tracks on ML, Pandas, DL.', links:[{label:'Competitions', url:'https://www.kaggle.com/competitions'}]}},
+        { title: 'fast.ai Courses', url: 'https://course.fast.ai/', desc: 'Top‑down practical deep learning.', category: 'ai', tags: ['fastai','dl','course'], about: { notes:'Great for practitioners; start with vision then nlp/tabular.', links:[{label:'Docs', url:'https://docs.fast.ai/'}]}},
+        { title: 'Hugging Face — Transformers', url: 'https://huggingface.co/docs/transformers/index', desc: 'NLP/vision/audio Transformers.', category: 'ai', tags: ['hf','transformers'], about:{notes:'Pretrained models, pipelines, and fine‑tuning guides.', links:[{label:'HF Hub', url:'https://huggingface.co/'}]}},
+        { title: 'YouTube (FA): آموزش یادگیری ماشین', url: 'https://www.youtube.com/results?search_query=%DB%8C%D8%A7%D8%AF%DA%AF%DB%8C%D8%B1%DB%8C+%D9%85%D8%A7%D8%B4%DB%8C%D9%86+%D9%81%D8%A7%D8%B1%D8%B3%DB%8C', desc: 'جست‌وجوی پلی‌لیست‌های فارسی ML.', category: 'ai', tags: ['fa','tutorial'], about:{notes:'Use this query to discover up‑to‑date Persian playlists.', links:[{label:'FA: پایتون مقدماتی', url:'https://www.youtube.com/results?search_query=%D8%A2%D9%85%D9%88%D8%B2%D8%B4+%D9%BE%D8%A7%DB%8C%D8%AA%D9%88%D9%86+%D9%81%D8%A7%D8%B1%D8%B3%DB%8C'}]}},
+        { title: 'GitHub — Branches Guide', url: 'https://docs.github.com/repositories/working-with-files/managing-branches-in-your-repository', desc: 'Learn branching basics.', category: 'career', tags: ['git','github','branches'], about:{notes:'Use branches for features; open PRs; squash on merge.', links:[{label:'Git Docs (branch)', url:'https://git-scm.com/docs/git-branch'}]}},
+      ];
+
+      // ---------------- Utilities ----------------
+      const $ = (s, r = document) => r.querySelector(s);
+      const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+      const cardTpl = $('#cardTemplate');
+
+      const formatDomain = (url) => { try { return new URL(url).hostname.replace(/^www\./,''); } catch { return '' } }
+      const applyTheme = (mode) => { const root = document.documentElement; (mode==='dark'?root.classList.add('dark'):root.classList.remove('dark')); localStorage.setItem('theme', mode); }
+
+      // Hash routing helpers
+      function parseHash(){
+        const h = new URLSearchParams((location.hash||'').replace(/^#/,''));
+        return {
+          route: h.get('route') || 'links',
+          q: h.get('q') || '',
+          cat: h.get('cat') || 'all',
+        }
+      }
+      function setHash(p){
+        const params = new URLSearchParams();
+        params.set('route', p.route||state.route||'links');
+        if (p.q!==undefined) params.set('q', p.q);
+        if (p.cat!==undefined) params.set('cat', p.cat);
+        location.hash = params.toString();
+      }
+
+      // Storage
+      const save = (data) => localStorage.setItem('ai-links', JSON.stringify(data));
+      const loadLocal = () => { const raw = localStorage.getItem('ai-links'); return raw ? JSON.parse(raw) : seedLinks; }
+
+      // Try to fetch ai-links.json from same origin (works on GitHub Pages)
+      async function loadRemote(){
+        try {
+          const res = await fetch('ai-links.json', { cache: 'no-store' });
+          if (!res.ok) throw new Error('no json');
+          const j = await res.json();
+          if (!Array.isArray(j)) throw new Error('bad json');
+          return j;
+        } catch { return null }
+      }
+
+      // ---------------- State ----------------
+      let state = { data: [], query: '', category: 'all', route: 'links', lang: localStorage.getItem('ai-lang')||'en' };
+
+      // ---------------- Render ----------------
+      function render(){
+        const dict = I18N[state.lang] || I18N.en;
+        // Toggle route views
+        $('#controls').classList.toggle('hidden', state.route!=='links');
+        $('#guide').classList.toggle('hidden', state.route!=='guide');
+        // Tabs styling
+        $$('.route-btn').forEach(b=>{
+          if (b.dataset.route===state.route){ b.classList.add('bg-slate-900','text-white','dark:bg-white','dark:text-slate-900'); b.classList.remove('border'); }
+          else { b.classList.remove('bg-slate-900','text-white','dark:bg-white','dark:text-slate-900'); b.classList.add('border'); }
+        })
+
+        // Render cards (links route)
+        const grid = $('#grid');
+        grid.innerHTML='';
+        const q = state.query.trim().toLowerCase();
+        const activeCat = state.category;
+        const filtered = state.data.filter(item=>{
+          const inCat = activeCat==='all' || item.category===activeCat;
+          const bag = [item.title, item.desc, item.url, (item.tags||[]).join(','), item.category].join(' ').toLowerCase();
+          const tagMatches = (q.match(/tag:([^\s]+)/g) || []).every(t => (item.tags||[]).map(x=>x.toLowerCase()).includes(t.split(':')[1].toLowerCase()));
+          const siteMatches = (q.match(/site:([^\s]+)/g) || []).every(s => item.url.toLowerCase().includes(s.split(':')[1].toLowerCase()));
+          const plainQ = q.replace(/tag:[^\s]+/g,'').replace(/site:[^\s]+/g,'').trim();
+          const textMatches = !plainQ || bag.includes(plainQ);
+          return inCat && tagMatches && siteMatches && textMatches;
+        });
+
+        for (const item of filtered){
+          const node = cardTpl.content.cloneNode(true);
+          const title = $('.title', node);
+          const desc = $('.desc', node);
+          const url = $('.url', node);
+          const tags = $('.tags', node);
+          const domain = $('.domain', node);
+          const about = $('.about', node);
+          title.textContent = item.title;
+          desc.textContent = item.desc || '';
+          url.href = item.url; url.title = item.url; url.textContent = (dict.open||'Open') + ' ↗';
+          domain.textContent = formatDomain(item.url);
+          about.textContent = dict.about;
+          (item.tags||[]).forEach(t=>{ const span=document.createElement('span'); span.textContent='#'+t; span.className='pill bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'; span.addEventListener('click',()=>{ $('#search').value=`tag:${t}`; state.query=`tag:${t}`; setHash({q:state.query}); render();}); tags.appendChild(span); });
+          about.addEventListener('click',()=>openAbout(item));
+          grid.appendChild(node);
+        }
+        $('#resultInfo').textContent = (dict.count||I18N.en.count)(filtered.length, activeCat, state.query);
+
+        // Category tab active state
+        $$('.tab').forEach(btn=>{
+          if (btn.dataset.cat===activeCat){ btn.classList.add('bg-slate-900','text-white','dark:bg-white','dark:text-slate-900'); btn.classList.remove('border'); }
+          else { btn.classList.remove('bg-slate-900','text-white','dark:bg-white','dark:text-slate-900'); btn.classList.add('border'); }
+        })
+      }
+
+      function openAbout(item){
+        $('#aboutTitle').textContent = item.title;
+        $('#aboutDesc').textContent = (item.about && item.about.notes) ? item.about.notes : (item.desc||'');
+        const cont = $('#aboutLinks'); cont.innerHTML='';
+        (item.about && item.about.links || []).forEach(l=>{
+          const a = document.createElement('a');
+          a.href=l.url; a.target='_blank'; a.rel='noopener';
+          a.textContent = '• ' + l.label + ' ↗';
+          a.className = 'text-sm text-cyan-600 dark:text-cyan-400 hover:underline';
+          cont.appendChild(a);
+        })
+        $('#aboutModal').dataset.open = 'true';
+      }
+
+      // ---------------- Events ----------------
+      addEventListener('DOMContentLoaded', async () => {
+        // Theme
+        const pref = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        applyTheme(pref);
+
+        // Load data: remote JSON (if available) + local
+        const remote = await loadRemote();
+        const local = loadLocal();
+        const merged = Array.isArray(remote) ? [...remote, ...local] : local;
+        state.data = merged;
+
+        // Routing
+        const h = parseHash();
+        state.query = h.q; state.category = h.cat; state.route = h.route;
+        $('#search').value = state.query;
+
+        // Wire controls
+        $('#search').addEventListener('input', e=>{ state.query=e.target.value; setHash({ q: state.query }); render(); });
+        $$('.tab').forEach(btn=> btn.addEventListener('click', ()=>{ state.category = btn.dataset.cat; setHash({ cat: state.category }); render(); }));
+        $$('.route-btn').forEach(btn=> btn.addEventListener('click', ()=>{ state.route = btn.dataset.route; setHash({ route: state.route, q: state.query, cat: state.category }); render(); }));
+        addEventListener('hashchange', ()=>{ const h=parseHash(); state.query=h.q; state.category=h.cat; state.route=h.route; $('#search').value = state.query; render(); });
+
+        // Add form
+        $('#addForm').addEventListener('submit', e=>{
+          e.preventDefault();
+          const fd = new FormData(e.target);
+          const item = Object.fromEntries(fd.entries());
+          item.tags = (item.tags||'').split(',').map(s=>s.trim()).filter(Boolean);
+          state.data.unshift(item);
+          save(state.data);
+          e.target.reset();
+          render();
+          location.hash = '#'+new URLSearchParams({route:'links',cat:state.category,q:state.query}).toString();
+        });
+
+        // Mode toggle
+        $('#modeBtn').addEventListener('click', ()=>{ const next = document.documentElement.classList.contains('dark') ? 'light':'dark'; applyTheme(next); });
+
+        // Export/Import
+        function download(fname, text){ const blob=new Blob([text], {type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fname; a.click(); }
+        $('#exportBtn').addEventListener('click', ()=>{
+          download('ai-links.json', JSON.stringify(state.data, null, 2));
+        });
+        $('#exportGitBtn').addEventListener('click', ()=>{
+          const d = new Date();
+          const fname = `ai-links_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.json`;
+          download(fname, JSON.stringify(state.data, null, 2));
+        });
+        $('#importBtn').addEventListener('click', ()=> $('#importInput').click());
+        $('#importInput').addEventListener('change', ev=>{ const file=ev.target.files?.[0]; if (!file) return; const reader=new FileReader(); reader.onload=()=>{ try{ const parsed=JSON.parse(reader.result); if(!Array.isArray(parsed)) throw new Error('bad'); state.data=parsed; save(state.data); render(); }catch{ alert('Invalid JSON.'); } }; reader.readAsText(file); });
+
+        // About modal
+        $('#aboutClose').addEventListener('click', ()=> $('#aboutModal').dataset.open='false');
+        $('#aboutModal').addEventListener('click', (e)=>{ if(e.target.id==='aboutModal') $('#aboutModal').dataset.open='false'; });
+
+        // Language (default EN)
+        setLang(state.lang);
+        $('#langBtn').addEventListener('click', ()=> setLang(state.lang==='fa'?'en':'fa'));
+
+        // Featured links hrefs
+        const FT = {
+          hf: 'https://huggingface.co/docs',
+          colab: 'https://colab.research.google.com/',
+          sklearn: 'https://scikit-learn.org/stable/user_guide.html'
+        }
+        $$('[data-ft]').forEach(a=> a.href = FT[a.dataset.ft]);
+      });
+    </script>
+  </body>
+</html>
