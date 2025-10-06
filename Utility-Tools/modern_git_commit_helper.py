@@ -81,6 +81,8 @@ def get_status_files() -> List[Dict[str, Any]]:
             "status": status,
             "rel": rel.replace("\\", "/"),
             "is_py": is_py,
+            "ext": full.suffix.lower(),
+
             "exists": full.exists(),
         })
     return items
@@ -235,209 +237,441 @@ async def api_open_explorer(payload: Dict[str, Any] = Body(...)) -> JSONResponse
 # ----------------------------- Frontend (HTML+JS) -----------------------------
 INDEX_HTML = """
 <!DOCTYPE html>
-<html lang="en">
+<html lang=\"en\" class=\"h-full\" >
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset=\"UTF-8\" />
+  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />
   <title>Modern Git Commit Helper</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    const state = {
-      files: [],
-      idx: 0,
-      current: null,
-    };
+  // Tailwind: dark mode بر مبنای کلاس
+  window.tailwind = { config: { darkMode: 'class' } };
+</script>
+<script>
+  // اعمال اولیه‌ی تم قبل از paint
+  (function () {
+    try {
+      const saved = localStorage.getItem('theme'); // 'dark' | 'light' | null
+      const sys = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const useDark = saved ? (saved === 'dark') : sys;
+      document.documentElement.classList.toggle('dark', useDark);
+    } catch {}
+  })();
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  (function(){
+    function init(){
+      const btn = document.getElementById('themeBtn');
+      if(!btn) return; // اگر دکمه نبود، بی‌صدا خروج
 
-    async function fetchStatus() {
-      const r = await fetch('/api/status');
-      state.files = await r.json();
-      state.idx = 0;
-      renderFilesTable();
-      if (state.files.length) selectIndex(0);
-      else renderEmpty();
-    }
+      function syncBtn(){
+        const isDark = document.documentElement.classList.contains('dark');
+        btn.textContent = isDark ? '☀' : '☾';
+        btn.setAttribute('aria-pressed', String(isDark));
+        btn.title = isDark ? 'Switch to light' : 'Switch to dark';
+      }
+      function applyTheme(dark){
+        document.documentElement.classList.toggle('dark', dark);
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+        syncBtn();
+      }
 
-    function renderFilesTable() {
-      const tbody = document.getElementById('files-body');
-      tbody.innerHTML = '';
-      state.files.forEach((f, i) => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-gray-50 cursor-pointer';
-        tr.onclick = () => selectIndex(i);
-        tr.innerHTML = `
-          <td class="px-3 py-2 text-sm">${f.status}</td>
-          <td class="px-3 py-2 text-sm font-mono">${f.rel}</td>
-          <td class="px-3 py-2 text-sm">${f.is_py ? 'python' : 'other'}</td>
-        `;
-        tbody.appendChild(tr);
+      // رویداد کلیک
+      btn.addEventListener('click', ()=> {
+        applyTheme(!document.documentElement.classList.contains('dark'));
       });
-      document.getElementById('count').textContent = state.files.length;
+
+      // همگام‌سازی اولیه دکمه با وضعیت فعلی
+      syncBtn();
+
+      // اگر کاربر ترجیح ذخیره نکرده، با تغییر تم سیستم همگام شود
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      (mq.addEventListener ? mq.addEventListener : mq.addListener)
+        .call(mq, e => { if (!localStorage.getItem('theme')) applyTheme(e.matches); });
     }
 
-    async function selectIndex(i) {
-      state.idx = i;
-      const file = state.files[i];
-      document.getElementById('indexLabel').textContent = `File ${i+1} / ${state.files.length}`;
-      document.getElementById('relPath').textContent = file.rel;
-      const r = await fetch(`/api/file?path=${encodeURIComponent(file.rel)}`);
-      const data = await r.json();
-      state.current = data;
-      renderDetail();
+    // تضمین اجرا بعد از ساخته‌شدن DOM (اسکریپت در head است)
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init, { once: true });
+    } else {
+      init();
     }
+  })();
+</script>
 
-    function renderEmpty(){
-      document.getElementById('detail').innerHTML = `
-        <div class="p-6 text-gray-500">No changes / untracked files found.</div>`;
-    }
-
-    function copyText(txt){
-      navigator.clipboard.writeText(txt).then(()=>{
-        toast('Copied to clipboard');
-      });
-    }
-
-    function toast(msg){
-      const t = document.getElementById('toast');
-      t.textContent = msg; t.classList.remove('hidden');
-      setTimeout(()=>t.classList.add('hidden'), 1400);
-    }
-
-    function nextFile(){
-      if (!state.files.length) return;
-      const ni = Math.min(state.files.length - 1, state.idx + 1);
-      selectIndex(ni);
-    }
-
-    function prevFile(){
-      if (!state.files.length) return;
-      const pi = Math.max(0, state.idx - 1);
-      selectIndex(pi);
-    }
-
-    async function doCommit(){
-      const msg = (document.getElementById('commitBox').value || '').trim();
-      if (!msg) { toast('Write a commit message first'); return; }
-      const path = state.current?.rel;
-      const r = await fetch('/api/commit', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path, message: msg })
-      });
-      if (!r.ok) { const e = await r.json(); toast('Error: ' + e.detail); return; }
-      const data = await r.json();
-      toast('Committed: ' + path);
-      await fetchStatus();
-      // stay on same index if possible
-      if (state.files.length) {
-        selectIndex(Math.min(state.idx, state.files.length-1));
-      } else { renderEmpty(); }
-    }
-
-    async function doPush(){
-      const r = await fetch('/api/push', { method: 'POST' });
-      const data = await r.json();
-      toast('Push done');
-      console.log(data.push);
-    }
-
-    async function openExplorer(){
-      const path = state.current?.rel; if (!path) return;
-      const r = await fetch('/api/open_explorer', {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ path })
-      });
-      if (r.ok) toast('Explorer opened'); else toast('Cannot open Explorer');
-    }
-
-    function renderDetail(){
-      const d = state.current; if (!d) return;
-      const isPy = d.is_py;
-      const fileCard = isPy ? `
-        <div class="bg-white rounded-2xl shadow p-4">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-lg font-semibold">Preview</h3>
-            <div class="space-x-2">
-              <button class="px-3 py-1.5 rounded-xl bg-gray-100" onclick="copyText(state.current.text)">Copy file</button>
-              <button class="px-3 py-1.5 rounded-xl bg-gray-100" onclick="copyText(state.current.prompt)">Copy prompt (Copilot/ChatGPT)</button>
-            </div>
-          </div>
-          <pre class="text-sm overflow-auto max-h-[360px] bg-gray-50 rounded-xl p-3"><code>${escapeHtml(d.text)}</code></pre>
-        </div>
-      ` : `
-        <div class="bg-white rounded-2xl shadow p-4">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-lg font-semibold">Non-.py asset</h3>
-            <button class="px-3 py-1.5 rounded-xl bg-gray-100" onclick="openExplorer()">Open in Explorer</button>
-          </div>
-          <p class="text-gray-600 text-sm">Use the chore(...) template below and adjust notes as needed.</p>
-        </div>`;
-
-      const commitCard = `
-        <div class="bg-white rounded-2xl shadow p-4">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-lg font-semibold">Commit message</h3>
-            <div class="space-x-2">
-              <button class="px-3 py-1.5 rounded-xl bg-gray-100" onclick="copyText(document.getElementById('commitBox').value)">Copy commit</button>
-              <button class="px-3 py-1.5 rounded-xl bg-black text-white" onclick="doCommit()">Commit & Next</button>
-            </div>
-          </div>
-          <textarea id="commitBox" class="w-full h-48 p-3 rounded-xl border border-gray-200 font-mono text-sm" spellcheck="false">${d.commit_template}</textarea>
-          <div class="mt-2 flex items-center gap-2">
-            <button class="px-3 py-1.5 rounded-xl bg-gray-100" onclick="prevFile()">Prev</button>
-            <button class="px-3 py-1.5 rounded-xl bg-gray-100" onclick="nextFile()">Next</button>
-          </div>
-        </div>
-      `;
-
-      document.getElementById('detail').innerHTML = `
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">${fileCard}${commitCard}</div>
-      `;
-    }
-
-    function escapeHtml(s){
-      return (s||'').replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));
-    }
-
-    window.addEventListener('DOMContentLoaded', fetchStatus);
-  </script>
+  <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"/>
+  <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin/>
+  <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\"/>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Apple Color Emoji','Segoe UI Emoji'; }
+    .glass { backdrop-filter: blur(8px); background: rgba(255,255,255,0.7); }
+    .dark .glass { background: rgba(17,24,39,0.6); }
+    .status-pill { @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium; }
+    .pill-qq { @apply bg-brand-50 text-brand-700; }    /* ?? */
+    .pill-mod { @apply bg-warn/10 text-warn; }        /* M */
+    .pill-add { @apply bg-accent/10 text-accent; }    /* A */
+    .pill-del { @apply bg-danger/10 text-danger; }    /* D */
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-  <div class="max-w-7xl mx-auto p-6 space-y-6">
-    <header class="flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold">Modern Git Commit Helper</h1>
-        <p class="text-gray-600 text-sm">Repo: {repo}</p>
+<body class=\"bg-gradient-to-br from-brand-50 to-white dark:from-slate-900 dark:to-slate-950 min-h-screen text-slate-800 dark:text-slate-100\">
+  <div class=\"max-w-7xl mx-auto p-6 space-y-6\">
+    <!-- Header -->
+    <header class=\"rounded-3xl shadow-lg glass dark:shadow-black/30 px-6 py-5 flex items-center justify-between\">
+      <div class=\"space-y-1\">
+        <h1 class=\"text-2xl font-bold tracking-tight\">Modern Git Commit Helper</h1>
+        <p class=\"text-sm text-slate-500 dark:text-slate-400\">Repo: {repo}</p>
       </div>
-      <div class="flex items-center gap-2">
-        <button class="px-3 py-2 rounded-xl bg-white shadow" onclick="fetchStatus()">Refresh</button>
-        <button class="px-3 py-2 rounded-xl bg-black text-white shadow" onclick="doPush()">Push origin {branch}</button>
+      <div class=\"flex items-center gap-2\">
+        <div class=\"hidden sm:flex gap-2\">
+          <button class=\"px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow hover:shadow-md transition\" onclick=\"fetchStatus()\">Refresh <span class=\"ml-2 text-xs text-slate-500\">(R)</span></button>
+          <button class=\"px-3 py-2 rounded-xl bg-brand-600 text-white shadow hover:bg-brand-700 transition\" onclick=\"doPush()\">Push origin {branch} <span class=\"ml-2 text-xs text-brand-200\">(P)</span></button>
+        </div>
+        <button id=\"themeBtn\" class=\"px-3 py-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow\" title=\"Toggle theme\" aria-label=\"Toggle theme\">☾</button>
       </div>
     </header>
 
-    <section class="bg-white rounded-2xl shadow overflow-hidden">
-      <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-        <div class="font-semibold">Changes & Untracked (<span id="count">0</span>)</div>
-        <div class="text-sm text-gray-500" id="indexLabel">–</div>
+    <!-- Filters / legend -->
+    <section class=\"grid grid-cols-1 lg:grid-cols-3 gap-3\">
+      <div class=\"col-span-2 rounded-2xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow p-3\">
+        <div class=\"flex items-center gap-2\">
+          <select id=\"search\" class=\"w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-400 font-mono text-sm\"><option value=\"all\">Folder Path: All</option></select>
+          <select id=\"kindFilter\" class=\"px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm\">
+            <option value=\"all\">All</option>
+            <option value=\"python\">Python</option>
+            <option value=\"other\">Other</option>
+          </select>
+          <select id=\"statusFilter\" class=\"px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm\">
+            <option value=\"all\">All Status</option>
+            <option value=\"??\">Untracked (??)</option>
+            <option value=\"M\">Modified (M)</option>
+            <option value=\"A\">Added (A)</option>
+            <option value=\"D\">Deleted (D)</option>
+          </select>
+        </div>
       </div>
-      <div class="overflow-auto max-h-[260px]">
-        <table class="min-w-full">
-          <thead class="bg-gray-50 text-left">
-            <tr>
-              <th class="px-3 py-2 text-xs font-semibold text-gray-500">Status</th>
-              <th class="px-3 py-2 text-xs font-semibold text-gray-500">Path</th>
-              <th class="px-3 py-2 text-xs font-semibold text-gray-500">Kind</th>
-            </tr>
-          </thead>
-          <tbody id="files-body"></tbody>
-        </table>
+      <div class=\"rounded-2xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow p-3 text-sm\">
+        <div class=\"flex items-center gap-3 flex-wrap\">
+          <span class=\"text-slate-500 dark:text-slate-400\">Shortcuts: R refresh, P push, J/K next/prev, C commit, E explorer, / search</span>
+        </div>
       </div>
-      <div class="px-4 py-3 border-t border-gray-100 text-sm text-gray-700">Selected: <span class="font-mono" id="relPath">–</span></div>
     </section>
 
-    <section id="detail"></section>
+    <!-- Table -->
+    <section class=\"rounded-3xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow overflow-hidden\">
+      <div class=\"px-4 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between\">
+        <div class=\"font-semibold\">Changes & Untracked (<span id=\"count\">0</span>)</div>
+        <div class=\"text-sm text-slate-500 dark:text-slate-400\" id=\"indexLabel\">–</div>
+      </div>
+      <div class=\"overflow-auto max-h-[300px]\">
+        <table class=\"min-w-full\">
+          <thead class=\"bg-slate-50 dark:bg-slate-800 sticky top-0 z-10 text-left\">
+            <tr>
+              <th class=\"px-3 py-2 text-xs font-semibold text-slate-500\">Status</th>
+              <th class=\"px-3 py-2 text-xs font-semibold text-slate-500\">Path</th>
+              <th class=\"px-3 py-2 text-xs font-semibold text-slate-500\">Kind</th>
+            </tr>
+          </thead>
+          <tbody id=\"files-body\"></tbody>
+        </table>
+      </div>
+      <div class=\"px-4 py-3 border-t border-slate-200 dark:border-slate-800 text-sm text-slate-700 dark:text-slate-300\">Selected: <span class=\"font-mono\" id=\"relPath\">–</span></div>
+    </section>
+
+    <!-- Detail -->
+    <section id=\"detail\"></section>
   </div>
 
-  <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 bg-black text-white text-sm rounded-xl shadow hidden">Copied</div>
+  <!-- Toast -->
+  <div id=\"toast\" class=\"fixed bottom-5 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl bg-slate-900 text-white text-sm shadow-lg hidden\">Copied</div>
+
+  <script>
+    const state = { files: [], idx: 0, current: null, raw: [] };
+    // Parent folder helpers for the dropdown (reusing id='search')
+    function getParentFolder(rel){
+      const i = rel.lastIndexOf('/');
+      return i >= 0 ? rel.slice(0, i) : ''; // root is ''
+    }
+
+    function collectParents(){
+      const set = new Set();
+      (state.raw || []).forEach(f => { set.add(getParentFolder(f.rel)); });
+      return Array.from(set).sort((a,b)=> a.localeCompare(b));
+    }
+
+ function populateSearchDropdown(){
+  const sel = document.getElementById('search');
+  if(!sel) return;
+
+  const parents = collectParents();
+
+  let opts = '<option value="all">All Folders</option>';  // ← مهم: تعریف اولیه
+  const hasRoot = (state.raw || []).some(f => !f.rel.includes('/'));
+  if (hasRoot) opts += '<option value="">root</option>';
+
+  parents.filter(p => p !== '').forEach(p => {
+    opts += '<option value="' + escapeHtml(p) + '">' + escapeHtml(p) + '</option>';
+  });
+
+  sel.innerHTML = opts;
+}
+
+// === File extension dropdown (kindFilter) ===
+function collectExtensions(){
+  const set = new Set();
+  (state.raw || []).forEach(f => {
+    const ext = (f.ext || '').toLowerCase();
+    set.add(ext);
+  });
+  const arr = Array.from(set);
+  arr.sort((a,b)=> {
+    if(a==='' && b==='') return 0;
+    if(a==='') return 1;
+    if(b==='') return -1;
+    return a.localeCompare(b);
+  });
+  return arr;
+}
+function collectStatuses(){
+  const set = new Set();
+  (state.raw || []).forEach(f => {
+    if (f.status) set.add(f.status);
+  });
+  // ترتیب پیشنهادی
+  const order = ['staged','modified','renamed','deleted','untracked','ignored','conflict','unknown'];
+  const arr = Array.from(set);
+  arr.sort((a,b)=>{
+    const ia = order.indexOf(a); const ib = order.indexOf(b);
+    if (ia === -1 && ib === -1) return a.localeCompare(b);
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
+  return arr;
+}
+
+function populateStatusDropdown(){
+  const sel = document.getElementById('statusFilter');  // ← sel تعریف شد
+  if(!sel) return;
+
+  const stats = collectStatuses();
+
+  let opts = '<option value="all">All Status</option>';     // ← opts تعریف شد (برچسب پیش‌فرض)
+  stats.forEach(s => {
+    opts += '<option value="' + escapeHtml(s) + '">' + escapeHtml(s) + '</option>';
+  });
+
+  sel.innerHTML = opts;
+}
+
+function populateKindDropdown(){
+  const sel = document.getElementById('kindFilter');  // ← تعریف sel
+  if(!sel) return;
+
+  const exts = collectExtensions();
+
+  let opts = '<option value="all">All Files</option>'; // ← تعریف opts
+  exts.forEach(ext => {
+    const label = ext ? ext : '(no ext)';
+    const val = ext || '__noext__';
+    opts += '<option value="' + escapeHtml(val) + '">' + escapeHtml(label) + '</option>';
+  });
+
+  sel.innerHTML = opts;
+}
+
+
+    // Theme toggle (persist)
+    const root = document.documentElement;
+    const themeBtn = () => document.getElementById('themeBtn');
+    function applyTheme(mode){
+      if(mode==='dark'){ root.classList.add('dark'); localStorage.setItem('theme','dark'); themeBtn().textContent='☀'; }
+      else { root.classList.remove('dark'); localStorage.setItem('theme','light'); themeBtn().textContent='☾'; }
+    }
+    (function(){ applyTheme(localStorage.getItem('theme')|| (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')); })();
+    document.addEventListener('click', (e)=>{ if(e.target.id==='themeBtn'){ applyTheme(root.classList.contains('dark')?'light':'dark'); }});
+
+    async function fetchStatus(){
+      const r = await fetch('/api/status');
+      state.raw = await r.json();
+      state.files = state.raw; // default
+      state.idx = 0;
+      populateSearchDropdown();
+      populateKindDropdown();
+      populateStatusDropdown()
+      renderFilesTable();
+      if (state.files.length) selectIndex(0); else renderEmpty();
+    }
+
+    function filterData(){
+      const p = document.getElementById('search').value; // selected parent folder
+      const k = document.getElementById('kindFilter').value;
+      const s = document.getElementById('statusFilter').value;
+      state.files = state.raw.filter(f=>{
+        const ext = (f.ext || '').toLowerCase();
+        const sel = (k === '__noext__') ? '' : (k || '');
+        const okK = (k==='all') || (ext === sel);
+        const okS = (s==='all') || (f.status===s || f.status.startsWith(s));
+        const okP = (p==='all') || (p==='' && !f.rel.includes('/')) || f.rel===p || f.rel.startsWith(p + '/');
+        return okP && okK && okS;
+      });
+      renderFilesTable();
+      if(state.files.length){ state.idx = 0; selectIndex(0);} else { renderEmpty(); }
+   
+    }
+
+    document.addEventListener('input', (e)=>{
+      if(['search','kindFilter','statusFilter'].includes(e.target.id)) filterData();
+    });
+
+    document.addEventListener('keydown', (e)=>{
+      if(e.key==='/' && !e.ctrlKey){ e.preventDefault(); document.getElementById('search').focus(); }
+      if(e.key.toLowerCase()==='r'){ fetchStatus(); }
+      if(e.key.toLowerCase()==='p'){ doPush(); }
+      if(e.key.toLowerCase()==='j'){ nextFile(); }
+      if(e.key.toLowerCase()==='k'){ prevFile(); }
+      if(e.key.toLowerCase()==='c'){ doCommit(); }
+      if(e.key.toLowerCase()==='e'){ openExplorer(); }
+      if(e.ctrlKey && e.key==='/'){ document.getElementById('search').focus(); }
+    });
+
+    function renderFilesTable(){
+      const tbody = document.getElementById('files-body');
+      tbody.innerHTML = '';
+      document.getElementById('count').textContent = state.files.length;
+      state.files.forEach((f, i) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer';
+        tr.onclick = () => selectIndex(i);
+        const pill = badgeFor(f.status);
+        tr.innerHTML = `
+          <td class=\"px-3 py-2 text-sm\">${pill}</td>
+          <td class=\"px-3 py-2 text-sm font-mono\">${escapeHtml(f.rel)}</td>
+          <td class=\"px-3 py-2 text-sm\">${(f.ext||'').startsWith('.') ? f.ext.slice(1) : (f.ext||'—')}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function badgeFor(status){
+      const s = status.trim();
+      if(s==='??') return `<span class=\"status-pill pill-qq\">?? new</span>`;
+      if(s==='M')  return `<span class=\"status-pill pill-mod\">M modified</span>`;
+      if(s==='A')  return `<span class=\"status-pill pill-add\">A added</span>`;
+      if(s==='D')  return `<span class=\"status-pill pill-del\">D deleted</span>`;
+      return `<span class=\"status-pill bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300\">${escapeHtml(s)}</span>`;
+    }
+
+    async function selectIndex(i){
+      state.idx = i; const file = state.files[i];
+      document.getElementById('indexLabel').textContent = `File ${i+1} / ${state.files.length}`;
+      document.getElementById('relPath').textContent = file.rel;
+      const r = await fetch(`/api/file?path=${encodeURIComponent(file.rel)}`);
+      const data = await r.json(); state.current = data; renderDetail();
+    }
+
+    function renderEmpty(){
+      document.getElementById('detail').innerHTML = `<div class=\"p-6 text-slate-500\">No changes / untracked files found.</div>`;
+    }
+
+    function copyText(txt){ navigator.clipboard.writeText(txt||'').then(()=> toast('Copied to clipboard')); }
+
+    function toast(msg){
+      const t = document.getElementById('toast'); t.textContent = msg; t.classList.remove('hidden');
+      setTimeout(()=> t.classList.add('hidden'), 1400);
+    }
+
+    function nextFile(){ if(!state.files.length) return; const ni = Math.min(state.files.length-1, state.idx+1); selectIndex(ni); }
+    function prevFile(){ if(!state.files.length) return; const pi = Math.max(0, state.idx-1); selectIndex(pi); }
+
+    async function doCommit(){
+      const box = document.getElementById('commitBox');
+      const msg = (box?.value || '').trim();
+      if(!msg){ toast('Write a commit message first'); box?.focus(); return; }
+      const path = state.current?.rel; if(!path){ toast('No file selected'); return; }
+      const r = await fetch('/api/commit', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ path, message: msg }) });
+      if(!r.ok){ const e = await r.json(); toast('Error: ' + e.detail); return; }
+      toast('Committed: ' + path);
+      await fetchStatus();
+      if (state.files.length) selectIndex(Math.min(state.idx, state.files.length-1)); else renderEmpty();
+    }
+
+    async function doPush(){ const r = await fetch('/api/push', { method:'POST'}); const d = await r.json(); toast('Push done'); console.log(d.push); }
+
+    async function openExplorer(){ const path = state.current?.rel; if(!path) return; const r = await fetch('/api/open_explorer', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ path }) }); if(r.ok) toast('Explorer opened'); else toast('Cannot open Explorer'); }
+
+    function renderDetail(){
+      const d = state.current; if(!d) return; const isPy = d.is_py;
+      const actions = isPy ? `<div class=\"space-x-2\">
+          <button class=\"px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800\" onclick=\"copyText(state.current.text)\">Copy file</button>
+          <button class=\"px-3 py-1.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900\" onclick=\"copyText(state.current.prompt)\">Copy prompt</button>
+        </div>` : `<button class=\"px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800\" onclick=\"openExplorer()\">Open in Explorer (E)</button>`;
+
+      const fileCard = isPy ? `
+        <div class=\"rounded-2xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow p-4\">
+          <div class=\"flex items-center justify-between mb-2\">
+            <h3 class=\"text-lg font-semibold\">Preview</h3>
+            ${actions}
+          </div>
+          <pre class=\"text-sm overflow-auto max-h-[360px] bg-slate-50 dark:bg-slate-800 rounded-xl p-3\"><code>${escapeHtml(d.text)}</code></pre>
+        </div>`
+      : `
+        <div class=\"rounded-2xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow p-4\">
+          <div class=\"flex items-center justify-between mb-2\">
+            <h3 class=\"text-lg font-semibold\">Non-.py asset</h3>
+            ${actions}
+          </div>
+          <p class=\"text-slate-600 dark:text-slate-400 text-sm\">Use the chore(...) template below and adjust notes as needed.</p>
+        </div>`;
+
+      const commitCard = `
+        <div class=\"rounded-2xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow p-4\">
+          <div class=\"flex items-center justify-between mb-2\">
+            <h3 class=\"text-lg font-semibold\">Commit message</h3>
+            <div class=\"space-x-2\">
+              <button class=\"px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800\" onclick=\"copyText(document.getElementById('commitBox').value)\">Copy commit</button>
+              <button class=\"px-3 py-1.5 rounded-xl bg-brand-600 text-white hover:bg-brand-700 transition\" onclick=\"doCommit()\">Commit & Next (C)</button>
+            </div>
+          </div>
+          <textarea id=\"commitBox\" class=\"w-full h-48 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/40 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-400\" spellcheck=\"false\">${d.commit_template}</textarea>
+          <div class=\"mt-2 flex items-center gap-2\">
+            <button class=\"px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800\" onclick=\"prevFile()\">Prev (K)</button>
+            <button class=\"px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800\" onclick=\"nextFile()\">Next (J)</button>
+          </div>
+        </div>`;
+
+      document.getElementById('detail').innerHTML = `<div class=\"grid grid-cols-1 xl:grid-cols-2 gap-6\">${fileCard}${commitCard}</div>`;
+    }
+
+    function escapeHtml(s){ return (s||'').replace(/[&<>\\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\\"':'&quot;'}[c])); }
+
+    window.addEventListener('DOMContentLoaded', () => { fetchStatus(); document.getElementById('search').addEventListener('keydown', e=>{ if(e.key==='Escape'){ e.target.blur(); }}); });
+  </script>
+
+<script>
+  (function(){
+    const btn = document.getElementById('themeBtn');
+    if(!btn) return;
+
+    function syncBtn(){
+      const isDark = document.documentElement.classList.contains('dark');
+      btn.textContent = isDark ? '☀' : '☾';
+      btn.setAttribute('aria-pressed', String(isDark));
+    }
+    function applyTheme(dark){
+      document.documentElement.classList.toggle('dark', dark);
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+      syncBtn();
+    }
+    btn.addEventListener('click', ()=>{
+      applyTheme(!document.documentElement.classList.contains('dark'));
+    });
+    syncBtn();
+  })();
+</script>
 </body>
+
+
 </html>
 """.replace("{repo}", str(REPO_PATH)).replace("{branch}", BRANCH)
 
