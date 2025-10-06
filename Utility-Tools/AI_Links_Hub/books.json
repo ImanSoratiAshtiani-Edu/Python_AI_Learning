@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Pattern Recognition and Machine Learning",
+    "authors": ["Christopher Bishop"],
+    "publisher": "Springer",
+    "edition": "1st",
+    "category": "Machine Learning",
+    "language": "EN",
+    "level": "Advanced"
+  },
+  {
+    "title": "Python Data Science Handbook",
+    "authors": ["Jake VanderPlas"],
+    "publisher": "O'Reilly",
+    "edition": "2nd",
+    "category": "Data / Viz",
+    "language": "EN",
+    "level": "Intermediate"
+  }
+]
