@@ -259,45 +259,55 @@ INDEX_HTML = """
 </script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
-  (function(){
-    function init(){
-      const btn = document.getElementById('themeBtn');
-      if(!btn) return; // اگر دکمه نبود، بی‌صدا خروج
+(function () {
+  function init() {
+    const btn = document.getElementById('themeBtn');
+    if (!btn) return;
 
-      function syncBtn(){
-        const isDark = document.documentElement.classList.contains('dark');
-        btn.textContent = isDark ? '☀' : '☾';
-        btn.setAttribute('aria-pressed', String(isDark));
-        btn.title = isDark ? 'Switch to light' : 'Switch to dark';
-      }
-      function applyTheme(dark){
-        document.documentElement.classList.toggle('dark', dark);
-        localStorage.setItem('theme', dark ? 'dark' : 'light');
-        syncBtn();
-      }
+    function syncBtn() {
+      const isDark = document.documentElement.classList.contains('dark');
+      btn.textContent = isDark ? '☀' : '☾';
+      btn.setAttribute('aria-pressed', String(isDark));
+      btn.title = isDark ? 'Switch to light' : 'Switch to dark';
+    }
 
-      // رویداد کلیک
-      btn.addEventListener('click', ()=> {
-        applyTheme(!document.documentElement.classList.contains('dark'));
-      });
-
-      // همگام‌سازی اولیه دکمه با وضعیت فعلی
+    function applyTheme(dark) {
+      document.documentElement.classList.toggle('dark', dark);
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
       syncBtn();
-
-      // اگر کاربر ترجیح ذخیره نکرده، با تغییر تم سیستم همگام شود
-      const mq = window.matchMedia('(prefers-color-scheme: dark)');
-      (mq.addEventListener ? mq.addEventListener : mq.addListener)
-        .call(mq, e => { if (!localStorage.getItem('theme')) applyTheme(e.matches); });
     }
 
-    // تضمین اجرا بعد از ساخته‌شدن DOM (اسکریپت در head است)
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init, { once: true });
-    } else {
-      init();
+    // رویداد کلیک
+    btn.addEventListener('click', () => {
+      applyTheme(!document.documentElement.classList.contains('dark'));
+    });
+
+    // همگام‌سازی اولیه
+    syncBtn();
+
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    if (!localStorage.getItem('theme')) applyTheme(mq.matches);
+
+    if ('addEventListener' in mq) {
+      mq.addEventListener('change', e => {
+        if (!localStorage.getItem('theme')) applyTheme(e.matches);
+      });
+    } else if ('addListener' in mq) {
+      mq.addListener(e => {
+        if (!localStorage.getItem('theme')) applyTheme(e.matches);
+      });
     }
-  })();
+  }
+
+  // 👇 اجرای ایمن پس از ساخت DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+})();
 </script>
+
 
   <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"/>
   <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin/>
@@ -375,7 +385,7 @@ INDEX_HTML = """
           <tbody id=\"files-body\"></tbody>
         </table>
       </div>
-      <div class=\"px-4 py-3 border-t border-slate-200 dark:border-slate-800 text-sm text-slate-700 dark:text-slate-300\">Selected: <span class=\"font-mono\" id=\"relPath\">–</span></div>
+      <div class=\"px-4 py-3 border-t border-slate-200 dark:border-slate-800 bg-black/70 text-slate-700 text-base dark:text-red-400\">>>>>    <span class=\"font-serif\" id=\"relPath\">–</span></div>
     </section>
 
     <!-- Detail -->
@@ -535,23 +545,40 @@ function populateKindDropdown(){
       if(e.ctrlKey && e.key==='/'){ document.getElementById('search').focus(); }
     });
 
-    function renderFilesTable(){
-      const tbody = document.getElementById('files-body');
-      tbody.innerHTML = '';
-      document.getElementById('count').textContent = state.files.length;
-      state.files.forEach((f, i) => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer';
-        tr.onclick = () => selectIndex(i);
-        const pill = badgeFor(f.status);
-        tr.innerHTML = `
-          <td class=\"px-3 py-2 text-sm\">${pill}</td>
-          <td class=\"px-3 py-2 text-sm font-mono\">${escapeHtml(f.rel)}</td>
-          <td class=\"px-3 py-2 text-sm\">${(f.ext||'').startsWith('.') ? f.ext.slice(1) : (f.ext||'—')}</td>
-        `;
-        tbody.appendChild(tr);
+    function renderFilesTable() {
+  const tbody = document.getElementById('files-body');
+  tbody.innerHTML = '';
+  document.getElementById('count').textContent = state.files.length;
+
+  state.files.forEach((f, i) => {
+    const tr = document.createElement('tr');
+    tr.className =
+      'hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors duration-150';
+    tr.dataset.index = i;
+
+    tr.onclick = () => {
+      // حذف انتخاب از تمام ردیف‌ها
+      document.querySelectorAll('#files-body tr').forEach(el => {
+        el.classList.remove('bg-emerald-100', 'dark:bg-slate-400/50', 'text-emerald-400');
       });
-    }
+
+      // افزودن رنگ به ردیف انتخاب‌شده
+      tr.classList.add('bg-emerald-100', 'dark:bg-slate-800/50', 'text-emerald-400');
+
+      // فراخوانی تابع اصلیت
+      selectIndex(i);
+    };
+
+    const pill = badgeFor(f.status);
+    tr.innerHTML = `
+      <td class="px-3 py-2 text-sm">${pill}</td>
+      <td class="px-3 py-2 text-sm font-mono">${escapeHtml(f.rel)}</td>
+      <td class="px-3 py-2 text-sm">${(f.ext||'').startsWith('.') ? f.ext.slice(1) : (f.ext||'—')}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
 
     function badgeFor(status){
       const s = status.trim();
@@ -584,19 +611,100 @@ function populateKindDropdown(){
     function nextFile(){ if(!state.files.length) return; const ni = Math.min(state.files.length-1, state.idx+1); selectIndex(ni); }
     function prevFile(){ if(!state.files.length) return; const pi = Math.max(0, state.idx-1); selectIndex(pi); }
 
-    async function doCommit(){
-      const box = document.getElementById('commitBox');
-      const msg = (box?.value || '').trim();
-      if(!msg){ toast('Write a commit message first'); box?.focus(); return; }
-      const path = state.current?.rel; if(!path){ toast('No file selected'); return; }
-      const r = await fetch('/api/commit', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ path, message: msg }) });
-      if(!r.ok){ const e = await r.json(); toast('Error: ' + e.detail); return; }
-      toast('Committed: ' + path);
-      await fetchStatus();
-      if (state.files.length) selectIndex(Math.min(state.idx, state.files.length-1)); else renderEmpty();
+    // ✅ تابع commit
+async function doCommit() {
+  const box = document.getElementById('commitBox');
+  const msg = (box?.value || '').trim();
+
+  if (!msg) {
+    toast('Write a commit message first');
+    box?.focus();
+    return;
+  }
+
+  const path = state.current?.rel;
+  if (!path) {
+    toast('No file selected');
+    return;
+  }
+
+  try {
+    const r = await fetch('/api/commit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path, message: msg }),
+    });
+
+    if (!r.ok) {
+      const e = await r.json();
+      toast('Error: ' + (e.detail || r.statusText));
+      return;
     }
 
-    async function doPush(){ const r = await fetch('/api/push', { method:'POST'}); const d = await r.json(); toast('Push done'); console.log(d.push); }
+    toast('Committed: ' + path);
+
+    if (box) {
+      box.value = '';
+      box.placeholder = '✅ Commit successful!\\nWrite your next commit message...';
+      box.classList.add('bg-emerald-900/40', 'text-emerald-200', 'transition-colors');
+      setTimeout(function () {
+        box.classList.remove('bg-emerald-900/40', 'text-emerald-200');
+      }, 2500);
+    }
+
+    await fetchStatus();
+    if (state.files.length)
+      selectIndex(Math.min(state.idx, state.files.length - 1));
+    else renderEmpty();
+
+    // 💤 در پایان ۳ ثانیه توقف (sleep)
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+  } catch (err) {
+    console.error(err);
+    toast('Commit failed: ' + err.message);
+  }
+}
+
+
+    // ✅ تابع push
+async function doPush() {
+  const box = document.getElementById('commitBox');
+
+  try {
+    // 🚀 درخواست push
+    const r = await fetch('/api/push', { method: 'POST' });
+    const d = await r.json();
+
+    // 🟢 نمایش پیام موفقیت کلی
+    toast('Push done');
+
+    // ✍️ نمایش نتیجه push در commitBox
+    if (box) {
+      const now = new Date().toLocaleTimeString();
+      const info =
+        (d.push && typeof d.push === 'object')
+          ? JSON.stringify(d.push, null, 2)
+          : String(d.push || 'No push details available');
+
+      box.value = `Push completed at ${now}\n\n${info}`;
+      box.classList.add('bg-blue-900/30', 'text-blue-200', 'transition-colors');
+      setTimeout(() => {
+        box.classList.remove('bg-blue-900/30', 'text-blue-200');
+      }, 3000);
+    }
+
+    console.log('Push result:', d.push);
+  } catch (err) {
+    console.error(err);
+    toast('Push failed: ' + err.message);
+    if (box) {
+      box.value = `Push failed:\n${err.message}`;
+      box.classList.add('bg-red-900/40', 'text-red-200');
+    }
+  }
+}
+
 
     async function openExplorer(){ const path = state.current?.rel; if(!path) return; const r = await fetch('/api/open_explorer', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ path }) }); if(r.ok) toast('Explorer opened'); else toast('Cannot open Explorer'); }
 
@@ -633,7 +741,7 @@ function populateKindDropdown(){
               <button class=\"px-3 py-1.5 rounded-xl bg-brand-600 text-white hover:bg-brand-700 transition\" onclick=\"doCommit()\">Commit & Next (C)</button>
             </div>
           </div>
-          <textarea id=\"commitBox\" class=\"w-full h-48 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/40 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-400\" spellcheck=\"false\">${d.commit_template}</textarea>
+          <textarea id=\"commitBox\" class=\"w-full h-48 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/20 light:bg-slate-900/40 font-mono text-bg focus:outline-none focus:ring-2 focus:ring-brand-400\" spellcheck=\"false\">${d.commit_template}</textarea>
           <div class=\"mt-2 flex items-center gap-2\">
             <button class=\"px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800\" onclick=\"prevFile()\">Prev (K)</button>
             <button class=\"px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800\" onclick=\"nextFile()\">Next (J)</button>
