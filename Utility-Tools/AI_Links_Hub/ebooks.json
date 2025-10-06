@@ -1,0 +1,113 @@
+[
+  {
+    "title": "Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow",
+    "authors": ["Aurélien Géron"],
+    "publisher": "O'Reilly Media",
+    "edition": "3rd",
+    "year": 2022,
+    "category": "python",
+    "language": "en",
+    "level": "intermediate",
+    "link": "Hands-on Machine Learning with Scikit-learn and Tensorflow.pdf"
+  },
+  {
+    "title": "Python for Data Analysis",
+    "authors": ["Wes McKinney"],
+    "publisher": "O'Reilly Media",
+    "edition": "3rd",
+    "year": 2022,
+    "category": "python",
+    "language": "en",
+    "level": "intermediate",
+    "link": "Wes-McKinney-Python-for-Data-Analysis_-Data-Wrangling-with-pandas-NumPy-and-Jupyter-OReilly-Media-2022.pdf"
+  },
+  {
+    "title": "Learning Python",
+    "authors": ["Mark Lutz"],
+    "publisher": "O'Reilly Media",
+    "edition": "5th",
+    "year": 2013,
+    "category": "python",
+    "language": "en",
+    "level": "beginner",
+    "link": "10-11_Learning Python 5E.pdf"
+  },
+  {
+    "title": "Python Crash Course",
+    "authors": ["Eric Matthes"],
+    "publisher": "No Starch Press",
+    "edition": "2nd",
+    "year": 2019,
+    "category": "python",
+    "language": "en",
+    "level": "beginner",
+    "link": "Python Crash Course ( PDFDrive.com ).pdf"
+  },
+  {
+    "title": "Python Cookbook",
+    "authors": ["David Beazley", "Brian K. Jones"],
+    "publisher": "O'Reilly Media",
+    "edition": "3rd",
+    "year": 2013,
+    "category": "python",
+    "language": "en",
+    "level": "advanced",
+    "link": "D. Beazley, B.K. Jones - Python Cookbook, 3rd Edition. 2013.pdf"
+  },
+  {
+    "title": "Think Python",
+    "authors": ["Allen B. Downey"],
+    "publisher": "Green Tea Press",
+    "edition": "2nd",
+    "year": 2015,
+    "category": "python",
+    "language": "en",
+    "level": "beginner",
+    "link": "think python.pdf"
+  },
+  {
+    "title": "Guide to NumPy",
+    "authors": ["Travis E. Oliphant"],
+    "publisher": "Trelgol Publishing",
+    "edition": "2nd",
+    "year": null,
+    "category": "python",
+    "language": "en",
+    "level": "intermediate",
+    "link": "Guide to NumPy_Travis E.Oliphant.pdf"
+  },
+  {
+    "title": "Machine Learning with PyTorch and Scikit-Learn",
+    "authors": ["Sebastian Raschka", "Yuxi (Hayden) Liu", "Vahid Mirjalili"],
+    "publisher": "Packt",
+    "edition": null,
+    "year": 2022,
+    "category": "python",
+    "language": "en",
+    "level": "intermediate",
+    "link": "Machine.Learning.with.PyTorch.and.Scikit-Learn.Sebastian.Raschka.Packt.9781801819312.EBooksWorld.ir.pdf"
+  },
+  {
+    "title": "The Visual Display of Quantitative Information",
+    "authors": ["Edward R. Tufte"],
+    "publisher": "Graphics Press",
+    "edition": "2nd",
+    "year": 2001,
+    "category": "data-viz",
+    "language": "en",
+    "level": "intermediate",
+    "link": "[TEC TUF] the visual display of quantitative information.pdf"
+  },
+  {
+    "title": "numpybook (prob. Numerical Python/Guide)",
+    "authors": null,
+    "publisher": null,
+    "edition": null,
+    "year": null,
+    "category": "python",
+    "language": "en",
+    "level": null,
+    "link": "numpybook.pdf"
+  }]
+
+
