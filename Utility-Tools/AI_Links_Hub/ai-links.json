@@ -1,0 +1,21 @@
+[
+  {
+    "title": "Your Repo README",
+    "url": "https://github.com/USERNAME/ai-links-hub",
+    "desc": "Place holder to your repository.",
+    "category": "career",
+    "tags": [
+      "git",
+      "github"
+    ],
+    "about": {
+      "notes": "Keep a README explaining how to use this hub.",
+      "links": [
+        {
+          "label": "GitHub Pages Docs",
+          "url": "https://docs.github.com/pages"
+        }
+      ]
+    }
+  }
+]
