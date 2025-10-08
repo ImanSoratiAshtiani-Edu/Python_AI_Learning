@@ -42,6 +42,33 @@ app.add_middleware(
 )
 
 # ----------------------------- Utilities -----------------------------
+# normalize_rel_path: added at version of 08/10/2025 because of currupt path fetching
+import re
+
+def normalize_rel_path(p: str) -> str:
+    """
+    Keep path *as-is* semantically but remove weird leading/trailing junk:
+    - strip BOM/ZWSP and whitespace
+    - strip wrapping quotes
+    - drop leading './' (porcelain sometimes gives that)
+    - unify backslashes to forward slashes
+    NOTE: We do NOT drop the first legit character.
+    """
+    if p is None:
+        return ""
+    # remove BOM / zero-width spaces
+    p = p.replace("\ufeff", "").replace("\u200b", "")
+    # strip whitespace/newlines
+    p = p.strip()
+    # unwrap quotes if the path is quoted as a whole
+    if len(p) >= 2 and ((p[0] == p[-1] == '"') or (p[0] == p[-1] == "'")):
+        p = p[1:-1]
+    # drop leading "./"
+    if p.startswith("./"):
+        p = p[2:]
+    # unify slashes
+    p = p.replace("\\", "/")
+    return p
 
 def run_git(args: List[str]) -> str:
     try:
@@ -66,7 +93,7 @@ def safe_path(rel_path: str) -> Path:
         raise HTTPException(status_code=400, detail="Path traversal detected")
     return p
 
-
+''' replaced the old mode of retrieve path, with the new regex-based git status
 def get_status_files() -> List[Dict[str, Any]]:
     out = run_git(["status", "--porcelain=1", "-uall"]) or ""
     lines = [ln for ln in out.splitlines() if ln.strip()]
@@ -86,7 +113,32 @@ def get_status_files() -> List[Dict[str, Any]]:
             "exists": full.exists(),
         })
     return items
+'''
+import re
 
+def get_status_files() -> List[Dict[str, Any]]:
+    out = run_git(["status", "--porcelain=1", "-uall"]) or ""
+    items: List[Dict[str, Any]] = []
+    for line in out.splitlines():
+        if not line.strip():
+            continue
+        # Porcelain v1: دو کاراکتر وضعیت + فاصله + مسیر
+        m = re.match(r"(.{2})\s+(.*)", line)
+        if not m:
+            # fallback: اگر الگو نخورد، کل خط را به عنوان مسیر بگیریم
+            status, rel = "??", line.strip()
+        else:
+            status, rel = m.group(1), m.group(2)
+        rel = normalize_rel_path(rel)
+        full = (REPO_PATH / rel).resolve()
+        items.append({
+            "status": status.strip(),
+            "rel": rel,
+            "is_py": full.suffix.lower() == ".py",
+            "ext": full.suffix.lower(),
+            "exists": full.exists(),
+        })
+    return items
 
 def read_file_preview(p: Path) -> str:
     if not p.exists() or not p.is_file():
@@ -172,6 +224,10 @@ async def api_status() -> JSONResponse:
     return JSONResponse(get_status_files())
 
 
+'''
+# api_file, api_commit, replaced with new version to correctly handle paths
+
+
 @app.get("/api/file")
 async def api_file(path: str = Query(...)) -> JSONResponse:
     p = safe_path(path)
@@ -194,15 +250,68 @@ async def api_file(path: str = Query(...)) -> JSONResponse:
 @app.post("/api/commit")
 async def api_commit(payload: Dict[str, Any] = Body(...)) -> JSONResponse:
     path = payload.get("path")
+    print(type(path), repr(path))
+    for pa in path.split():
+      print(pa)
     message = payload.get("message", "").strip()
     if not path or not message:
         raise HTTPException(status_code=400, detail="path and message are required")
     p = safe_path(path)
+    print(p)
     if not p.exists():
         raise HTTPException(status_code=404, detail="file not found")
 
     add_out = run_git(["add", "--", path])
     # write temp file for multi-line commit
+    tmp = Path(os.getenv("TEMP", str(REPO_PATH))) / "_git_helper_commit_msg.txt"
+    tmp.write_text(message, encoding="utf-8")
+    com_out = run_git(["commit", "-F", str(tmp)])
+    try:
+        tmp.unlink(missing_ok=True)
+    except Exception:
+        pass
+    return JSONResponse({"added": path, "git_add": add_out, "git_commit": com_out})
+'''
+@app.get("/api/file")
+async def api_file(path: str = Query(...)) -> JSONResponse:
+    path = normalize_rel_path(path)
+    p = safe_path(path)
+    is_py = p.suffix.lower() == ".py"
+    text = read_file_preview(p) if is_py else ""
+    commit_tmpl = build_commit_template(path, text) if is_py else (
+        f"chore({Path(path).parent.as_posix() or 'root'}): add {Path(path).name}\n\n"
+        "- describe what this asset contains\n"
+        "- why it is added and how it is used\n"
+        "- reference related notebooks or code if applicable"
+    )
+    prompt = build_copilot_prompt(path, text) if is_py else ""
+    return JSONResponse({
+        "rel": path,
+        "exists": p.exists(),
+        "is_py": is_py,
+        "text": text,
+        "commit_template": commit_tmpl,
+        "prompt": prompt,
+    })
+
+
+@app.post("/api/commit")
+async def api_commit(payload: Dict[str, Any] = Body(...)) -> JSONResponse:
+    raw_path = payload.get("path")
+    path = normalize_rel_path(raw_path)
+    message = (payload.get("message") or "").strip()
+
+    if not path or not message:
+        raise HTTPException(status_code=400, detail="path and message are required")
+    path = path.split()[-1]  # for cut the status of file, only keep the path
+    p = safe_path(path)
+    if not p.exists():
+        # دیباگ دوستانه: اگر وجود ندارد، در لاگ repr چاپ کن
+        print("api_commit: received path=", repr(raw_path), "normalized=", repr(path))
+        print("Resolved path:", path)
+        raise HTTPException(status_code=404, detail="file not found")
+
+    add_out = run_git(["add", "--", path])
     tmp = Path(os.getenv("TEMP", str(REPO_PATH))) / "_git_helper_commit_msg.txt"
     tmp.write_text(message, encoding="utf-8")
     com_out = run_git(["commit", "-F", str(tmp)])
@@ -752,7 +861,7 @@ async function doPush() {
     }
 
     function escapeHtml(s){ return (s||'').replace(/[&<>\\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\\"':'&quot;'}[c])); }
-
+    
     window.addEventListener('DOMContentLoaded', () => { fetchStatus(); document.getElementById('search').addEventListener('keydown', e=>{ if(e.key==='Escape'){ e.target.blur(); }}); });
   </script>
 
