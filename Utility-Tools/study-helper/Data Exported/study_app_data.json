@@ -1,0 +1,241 @@
+{
+  "categories": [
+    {
+      "id": "yjvha3quy8fmghw02gk",
+      "name": "Python-AI",
+      "subs": [
+        {
+          "id": "k519f3v5g4emghw0sr8",
+          "name": "Python basics",
+          "materials": [
+            {
+              "id": "wkkyky234limghwf7uv",
+              "title": "ChatGPT Roadmap",
+              "url": "https://chatgpt.com/g/g-p-68946c31c75081919aeac9179f31a33a-python-learning/project",
+              "clicks": 0,
+              "lastClickedAt": null,
+              "history": []
+            },
+            {
+              "id": "h327hv5d3vrmghwp6s4",
+              "title": "Udemy: 100-days-of-code",
+              "url": "https://chatgpt.com/g/g-p-68946c31c75081919aeac9179f31a33a-python-learning/project",
+              "clicks": 0,
+              "lastClickedAt": null,
+              "history": []
+            }
+          ]
+        },
+        {
+          "id": "t03mocc2b9pmghw151k",
+          "name": "Machine learning",
+          "materials": [
+            {
+              "id": "82il2krevxtmghwa6kq",
+              "title": "Smartec",
+              "url": "https://web.telegram.org/k/#-2412749743",
+              "clicks": 1,
+              "lastClickedAt": "2025-10-08T11:46:48.234Z",
+              "history": [
+                {
+                  "ts": "2025-10-08T11:46:48.234Z"
+                }
+              ]
+            },
+            {
+              "id": "uo1rvtre9wfmghwe3zg",
+              "title": "Copilot short road",
+              "url": "https://m365.cloud.microsoft/",
+              "clicks": 0,
+              "lastClickedAt": null,
+              "history": []
+            },
+            {
+              "id": "fmpah4cjotpmghwn9qn",
+              "title": "Udemy: Machine Learning A-Z",
+              "url": "https://www.udemy.com/course/machinelearning/learn/lecture/19799928?start=0#overview",
+              "clicks": 0,
+              "lastClickedAt": null,
+              "history": []
+            },
+            {
+              "id": "4pmg4704t1mghwon26",
+              "title": "Coursera: Supervised Machine Learning: Regression and Classification",
+              "url": "https://www.coursera.org/learn/machine-learning/",
+              "clicks": 0,
+              "lastClickedAt": null,
+              "history": []
+            },
+            {
+              "id": "rgeqeirm5zmghws3sr",
+              "title": "Udemy: Breast Cancer detection using Logistic Regression",
+              "url": "https://www.udemy.com/course/logistic-regression-cancer-detection-case-study/learn/lecture/18888184?start=0#overview",
+              "clicks": 0,
+              "lastClickedAt": null,
+              "history": []
+            }
+          ]
+        },
+        {
+          "id": "a7hjxncfizimghw1cx4",
+          "name": "Data Visualization",
+          "materials": [
+            {
+              "id": "s0oec5n5eikmghwpu0c",
+              "title": "Coursera: University of Illinois Urbana-Champaign",
+              "url": "https://www.coursera.org/learn/datavisualization",
+              "clicks": 0,
+              "lastClickedAt": null,
+              "history": []
+            }
+          ]
+        },
+        {
+          "id": "23kvwh27tijmghwblfw",
+          "name": "Computer Vision",
+          "materials": [
+            {
+              "id": "tg841q6wbfmghwc6wk",
+              "title": "Smartec",
+              "url": "https://web.telegram.org/k/#-2490880947",
+              "clicks": 0,
+              "lastClickedAt": null,
+              "history": []
+            },
+            {
+              "id": "ks2x8f5hu7mghwmc2y",
+              "title": "Udemy: Data Prep & EDA with Python",
+              "url": "https://www.udemy.com/course/data-science-in-python-data-prep-eda/learn/lecture/39017716?start=0#overview",
+              "clicks": 0,
+              "lastClickedAt": null,
+              "history": []
+            }
+          ]
+        },
+        {
+          "id": "f4vjq867h5emghwg2wt",
+          "name": "EXERCISE and REPEATING",
+          "materials": [
+            {
+              "id": "a92w09uns8lmghwgqbt",
+              "title": "Various materials",
+              "url": "",
+              "clicks": 0,
+              "lastClickedAt": null,
+              "history": []
+            }
+          ]
+        },
+        {
+          "id": "nkbyguq8egmghwlcs0",
+          "name": "pandas & EDA",
+          "materials": [
+            {
+              "id": "2l2psa0qro4mghwqi39",
+              "title": "Udemy: Data Prep & EDA with Python",
+              "url": "https://www.udemy.com/course/data-science-in-python-data-prep-eda/learn/lecture/39017716?start=0#overview",
+              "clicks": 0,
+              "lastClickedAt": null,
+              "history": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2tpyf304g9dmghx1amj",
+      "name": "SQL & RedCap",
+      "subs": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "4yqqgn5ikyjmghwtqgh",
+      "text": "register on mikhak: password riquest",
+      "date": "2025-10-08T00:00:00.000Z",
+      "interval": "daily",
+      "completedAt": null,
+      "lastDoneAt": null
+    },
+    {
+      "id": "tenyslpivmbmghwvmsb",
+      "text": "going to clinic with Francesco Carluccio at 13:00",
+      "date": "2025-10-09T00:00:00.000Z",
+      "interval": "daily",
+      "completedAt": null,
+      "lastDoneAt": null
+    },
+    {
+      "id": "nrs9k3d8zicmghx2u1x",
+      "text": "visit with dr. maknouni at 13:30",
+      "date": "2025-10-13T00:00:00.000Z",
+      "interval": "daily",
+      "completedAt": null,
+      "lastDoneAt": null
+    },
+    {
+      "id": "g2kqs7bdmnsmghx3grj",
+      "text": "prenotation: Dermatologo",
+      "date": null,
+      "interval": "monthly",
+      "completedAt": null,
+      "lastDoneAt": null
+    },
+    {
+      "id": "rfijhx4m59kmghx484j",
+      "text": "Tel to Dentist",
+      "date": null,
+      "interval": "monthly",
+      "completedAt": null,
+      "lastDoneAt": null
+    },
+    {
+      "id": "6ciaqm4rqlmghx4sda",
+      "text": "investiment on bbva",
+      "date": null,
+      "interval": "monthly",
+      "completedAt": null,
+      "lastDoneAt": null
+    },
+    {
+      "id": "exuloza7g9jmghx5d28",
+      "text": "msg to Francesca Dreagone",
+      "date": null,
+      "interval": "monthly",
+      "completedAt": null,
+      "lastDoneAt": null
+    },
+    {
+      "id": "1jnkev006s7mghx6e9v",
+      "text": "msg to Nardin",
+      "date": null,
+      "interval": "monthly",
+      "completedAt": null,
+      "lastDoneAt": null
+    },
+    {
+      "id": "y2db4tzorpimghx6vq1",
+      "text": "Buy Violin",
+      "date": null,
+      "interval": "monthly",
+      "completedAt": null,
+      "lastDoneAt": null
+    },
+    {
+      "id": "pgk3tj787bomghx7k7p",
+      "text": "Send doc to LLM course istitue",
+      "date": null,
+      "interval": "weekly",
+      "completedAt": null,
+      "lastDoneAt": null
+    },
+    {
+      "id": "tqx33x99ulmghx83u4",
+      "text": "send partitaiva to devops course",
+      "date": null,
+      "interval": "weekly",
+      "completedAt": null,
+      "lastDoneAt": null
+    }
+  ]
+}

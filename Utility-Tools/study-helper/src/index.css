@@ -1,0 +1,123 @@
+@layer base {
+  :root {
+    --background: #f8fafc;
+    --foreground: #1e293b;
+    --primary: #2563eb;
+    --primary-foreground: #ffffff;
+    --secondary: #f59e0b;
+    --secondary-foreground: #ffffff;
+    --accent: #10b981;
+    --accent-foreground: #ffffff;
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --card: #ffffff;
+    --card-foreground: #1e293b;
+  }
+
+  .dark {
+    --background: #0f172a;
+    --foreground: #f8fafc;
+    --primary: #1e3a8a;
+    --primary-foreground: #ffffff;
+    --secondary: #b45309;
+    --secondary-foreground: #ffffff;
+    --accent: #047857;
+    --accent-foreground: #ffffff;
+    --destructive: #dc2626;
+    --destructive-foreground: #ffffff;
+    --card: #1e293b;
+    --card-foreground: #f8fafc;
+  }
+
+  /* Stronger contrast for buttons and cards */
+  .btn, .card, .tab, .switch {
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  }
+
+  .btn:hover, .card:hover {
+    filter: brightness(1.15);
+  }
+
+  .dark .btn:hover, .dark .card:hover {
+    filter: brightness(0.9);
+  }
+
+  button {
+    font-weight: 600;
+    border-radius: 0.75rem;
+  }
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* ---------- 🌈 Material Style for shadcn (fixed version) ---------- */
+
+  .bg-card {
+    @apply border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm transition;
+    background-color: #ffffff;
+  }
+
+  .dark .bg-card {
+    background-color: #1e293b;
+  }
+
+  .bg-card:hover {
+    filter: brightness(1.05);
+  }
+
+  .dark .bg-card:hover {
+    filter: brightness(1.15);
+  }
+
+  .text-card-foreground {
+    color: #1e293b;
+  }
+
+  .dark .text-card-foreground {
+    color: #f8fafc;
+  }
+
+  .bg-primary {
+    background-color: #2563eb;
+    color: #ffffff;
+  }
+
+  .bg-primary:hover {
+    background-color: #1e3a8a;
+  }
+
+  .bg-accent {
+    background-color: #10b981;
+    color: #ffffff;
+  }
+
+  .bg-accent:hover {
+    background-color: #047857;
+  }
+
+  .bg-secondary {
+    background-color: #f59e0b;
+    color: #ffffff;
+  }
+
+  .bg-secondary:hover {
+    background-color: #b45309;
+  }
+
+  input,
+  textarea,
+  select {
+    @apply border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  }
+
+  h1, h2, h3, h4, h5 {
+    @apply font-bold tracking-tight;
+  }
+
+  p {
+    @apply leading-relaxed;
+  }
+}
