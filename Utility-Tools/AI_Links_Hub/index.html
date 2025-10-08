@@ -56,7 +56,7 @@
 
     </style>
   </head>
-  <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen selection:bg-cyan-300/40 selection:text-slate-900">
+  <body class="bg-slate-500 dark:bg-slate-900 text-slate-950 dark:text-slate-200 min-h-screen selection:bg-cyan-300/40 selection:text-slate-900">
     <!-- Background aesthetics -->
     <div class="pointer-events-none fixed inset-0 -z-10">
       <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-500/10 via-indigo-500/5 to-transparent"></div>
@@ -70,18 +70,18 @@
           <div class="w-10 h-10 rounded-2xl bg-cyan-500 text-white grid place-items-center font-extrabold shadow-glow">AI</div>
           <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">AI Links Hub</h1>
-            <p id="subtitle" class="text-sm text-slate-600 dark:text-slate-400 mt-1">A personal library of helpful links; with search, tags & categories.</p>
+            <p id="subtitle" class="text-sm text-slate-950 dark:text-slate-400 mt-1">A personal library of helpful links; with search, tags & categories.</p>
           </div>
         </div>
         <nav class="flex items-center gap-2">
-          <button data-route="links" class="route-btn smooth px-3 py-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-sm">Links</button>
-          <button data-route="guide" class="route-btn smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm">Guide</button>
-          <button id="langBtn" class="smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm" title="Toggle language">FA / EN</button>
-          <button id="exportBtn" class="smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm">Export JSON</button>
-          <button id="importBtn" class="smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm">Import JSON</button>
+          <button data-route="links" class="route-btn smooth px-3 py-2 rounded-xl border border-slate-900 hover:border-slate-100 bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-sm">Links</button>
+          <button data-route="guide" class="route-btn smooth px-3 py-2 rounded-xl border border-slate-900 hover:border-slate-100 dark:border-slate-700 text-sm">Guide</button>
+          <button id="langBtn" class="smooth px-3 py-2 rounded-xl border border-slate-900 hover:border-slate-100 dark:border-slate-700 text-sm" title="Toggle language">FA / EN</button>
+          <button id="exportBtn" class="smooth px-3 py-2 rounded-xl border border-slate-900 hover:border-slate-100 dark:border-slate-700 dark:hover:bg-slate-800 text-sm">Export JSON</button>
+          <button id="importBtn" class="smooth px-3 py-2 rounded-xl border border-slate-900 hover:border-slate-100 dark:border-slate-700 dark:hover:bg-slate-800 text-sm">Import JSON</button>
           <input id="importInput" type="file" accept="application/json" class="hidden" />
-          <button id="modeBtn" class="smooth px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm" title="Dark/Light">🌓</button>
-          <a href="#add" class="smooth px-3 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-600 text-white text-sm">+ Add</a>
+          <button id="modeBtn" class="smooth px-3 py-2 rounded-xl border border-slate-900 hover:border-slate-100 dark:border-slate-700  dark:hover:bg-slate-800 text-sm" title="Dark/Light">🌓</button>
+          <a href="#add" class="smooth px-3 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-700 text-black text-sm">+ Add</a>
         </nav>
       </header>
 
@@ -89,20 +89,20 @@
       <section id="controls" class="glass rounded-2xl p-4 border border-slate-200/40 dark:border-white/5 mb-6">
         <div class="flex flex-col md:flex-row gap-3 md:items-center">
           <div class="relative flex-1">
-            <input id="search" type="search" placeholder="Search title, description, tag or domain… (use tag:vision site:arxiv.org)" class="w-full rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-cyan-500/40">
+            <input id="search" type="search" placeholder="Search title, description, tag or domain… (use tag:vision site:arxiv.org)" class="w-full rounded-xl border border-stone-700 hover:border-black bg-zinc-700/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-cyan-500/40">
             <span class="absolute right-3 top-2.5 text-slate-400">🔎</span>
           </div>
           <!-- Category dropdown (replaces the button row) -->
           <div class="flex items-center gap-2">
-            <label for="categorySelect" class="text-xs text-slate-500 dark:text-slate-400">Category:</label>
+            <label for="categorySelect" class="text-xs text-slate-950 dark:text-slate-400">Category:</label>
             <select id="categorySelect"
-                    class="rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-3 py-2">
+                    class="rounded-xl border border-stone-700 hover:border-red-700 bg-stone-500 dark:bg-slate-950/60  dark:border-slate-800 px-3 py-2">
               <!-- options will be populated from filters.json + defaults -->
             </select>
           </div>
 
         </div>
-        <div class="mt-3 text-xs text-slate-500 dark:text-slate-400" id="searchHelp">Tip: Combine text + operators like <code class="px-1 rounded bg-slate-200/60 dark:bg-slate-800">deep-learning tag:vision site:arxiv.org</code></div>
+        <div class="mt-3 text-xs text-slate-950 dark:text-slate-400" id="searchHelp">Tip: Combine text + operators like <code class="px-1 rounded bg-slate-200/60 dark:bg-slate-800">deep-learning tag:vision site:arxiv.org</code></div>
       </section>
 
 <!-- Featured (new) -->
@@ -112,7 +112,7 @@
 
     <!-- View switch -->
     <button id="viewToggle"
-            class="px-3 py-1.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
+            class="px-3 py-1.5 text-sm rounded-xl border border-slate-900 hover:border-slate-100 dark:border-slate-700 hover:bg-cyan-500 dark:hover:bg-slate-800"
             role="switch" aria-checked="false" title="Switch to list view">
       List view: Off
     </button>
@@ -123,145 +123,168 @@
 
     <!-- Google Colab -->
     <a href="https://colab.research.google.com" target="_blank" rel="noopener"
-       class="block rounded-2xl border border-slate-200 dark:border-slate-800 p-4
-              bg-white/70 dark:bg-slate-900/60 backdrop-blur
+       class="block rounded-2xl border border-neutral-700 dark:border-slate-800 p-4
+              bg-zinc-400/70 dark:bg-black/80 backdrop-blur
+              hover:border-red-400 hover:text-black dark:hover:text-white hover:font-bold
               transition hover:shadow-lg hover:-translate-y-0.5 group
               flex flex-col gap-2 min-h-12 md:min-h-20">
       <div class="flex items-center justify-between">
-        <h3 class="font-bold">Google Colab</h3>
+        <h3 class="font-semibold">Google Colab</h3>
       </div>
-      <p class="text-xs text-slate-600 dark:text-slate-300">Run notebooks in the cloud with GPUs</p>
+      <p class="text-xs text-slate-800 dark:text-slate-300">Run notebooks in the cloud with GPUs</p>
     </a>
 
     <!-- Google Drive -->
     <a href="https://drive.google.com/drive/u/0/home" target="_blank" rel="noopener"
-       class="block rounded-2xl border border-slate-200 dark:border-slate-800 p-4
-              bg-white/70 dark:bg-slate-900/60 backdrop-blur
+       class="block rounded-2xl border border-neutral-700 dark:border-slate-800 p-4
+              bg-zinc-400/70 dark:bg-black/80 backdrop-blur
+              hover:border-red-400 hover:text-black dark:hover:text-white hover:font-bold
               transition hover:shadow-lg hover:-translate-y-0.5 group
               flex flex-col gap-2 min-h-10 md:min-h-20">
       <div class="flex items-center justify-between">
-        <h3 class="font-bold">Google Drive</h3>
+        <h3 class="font-semibold">Google Drive</h3>
       </div>
-      <p class="text-xs text-slate-600 dark:text-slate-300">My Google Drive</p>
+      <p class="text-xs text-slate-800 dark:text-stone-300">My Google Drive</p>
     </a>
 
     <!-- GitHub -->
     <a href="https://github.com" target="_blank" rel="noopener"
-       class="block rounded-2xl border border-slate-200 dark:border-slate-800 p-4
-              bg-white/70 dark:bg-slate-900/60 backdrop-blur
+       class="block rounded-2xl border border-neutral-700 dark:border-slate-800 p-4
+              bg-zinc-400/70 dark:bg-black/80 backdrop-blur
+              hover:border-red-400 hover:text-black dark:hover:text-white hover:font-bold
               transition hover:shadow-lg hover:-translate-y-0.5 group
               flex flex-col gap-2 min-h-10 md:min-h-20">
       <div class="flex items-center justify-between">
-        <h3 class="font-bold">GitHub</h3>
+        <h3 class="font-semibold">GitHub</h3>
       </div>
-      <p class="text-xs text-slate-600 dark:text-slate-300">Host code, branches, and GitHub Pages</p>
+      <p class="text-xs text-slate-800 dark:text-slate-300">Host code, branches, and GitHub Pages</p>
     </a>
 
     <!-- Books List (from books.json) -->
     <button id="featured-books"
-            class="block w-full text-left rounded-2xl border border-slate-200 dark:border-slate-800 p-4
-                   bg-white/70 dark:bg-slate-900/60 backdrop-blur cursor-pointer
+            class="block w-full text-left rounded-2xl border border-neutral-700 dark:border-slate-800 p-4
+                   bg-zinc-400/70 dark:bg-black/80 backdrop-blur cursor-pointer
+                   hover:border-red-400 hover:text-black dark:hover:text-white hover:font-bold
                    transition hover:shadow-lg hover:-translate-y-0.5
                    flex flex-col gap-2 min-h-10 md:min-h-20">
       <div class="flex items-center justify-between">
-        <h3 class="font-bold">Books List</h3>
+        <h3 class="font-semibold">Books List</h3>
         <span class="badge text-xs px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">JSON</span>
       </div>
-      <p class="text-xs text-slate-600 dark:text-slate-300">List of useful books</p>
+      <p class="text-xs text-slate-800 dark:text-slate-300">List of useful books</p>
     </button>
 
     <!-- Ebooks (from ebooks.json) -->
     <button id="featured-ebooks"
-            class="block w-full text-left rounded-2xl border border-slate-200 dark:border-slate-800 p-4
-                   bg-white/70 dark:bg-slate-900/60 backdrop-blur cursor-pointer
+            class="block w-full text-left rounded-2xl border border-neutral-700 dark:border-slate-800 p-4
+                   bg-zinc-400/70 dark:bg-black/80 backdrop-blur cursor-pointer
+                   hover:border-red-400 hover:text-black dark:hover:text-white hover:font-bold
                    transition hover:shadow-lg hover:-translate-y-0.5
                    flex flex-col gap-2 min-h-10 md:min-h-20">
       <div class="flex items-center justify-between">
-        <h3 class="font-bold">Ebooks</h3>
+        <h3 class="font-semibold">Ebooks</h3>
         <span class="badge text-xs px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">JSON</span>
       </div>
-      <p class="text-xs text-slate-600 dark:text-slate-300">Open PDFs</p>
+      <p class="text-xs text-slate-800 dark:text-slate-300">Open PDFs</p>
     </button>
   </div>
 </section>
+<!-- Results info -->
+      <div id="resultInfo" class="text-xs text-slate-500 dark:text-slate-400 mb-2">—</div>
+      <!-- Links grid -->
+      <main id="grid" class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4 text-slate-800 dark:text-red-100 font-arial"></main>
 <script>
 (function(){
   const btn = document.getElementById('viewToggle');
-  const grid = document.getElementById('featuredCards');
-  if(!btn || !grid) return;
+  const grids = [
+    document.getElementById('featuredCards'),
+    document.getElementById('grid')   // ← نتایج
+  ].filter(Boolean);
 
-  function setView(compact){
-    grid.dataset.view = compact ? 'compact' : 'grid';
+  if(!btn || grids.length === 0) return;
 
-    // container style
-    grid.classList.toggle('grid', true);
-    grid.classList.toggle('gap-1.5', compact);    // فاصله کمتر بین کارت‌ها
-    grid.classList.toggle('gap-2', !compact);
-    grid.classList.toggle('sm:grid-cols-2', !compact);
-    grid.classList.toggle('sm:grid-cols-5', compact);
-    grid.classList.toggle('lg:grid-cols-5', !compact);
+  // حالت جهانی تا بتوانیم در render() دوباره اعمالش کنیم
+  let compact = false;
 
-    // cards
-    [...grid.children].forEach(card => {
-      const title = card.querySelector('h3');
-      const desc = card.querySelector('p');
+  function applyCompactToGrid(grid, isCompact){
+    grid.dataset.view = isCompact ? 'compact' : 'grid';
     
+    [...grid.children].forEach(card => {
       // بازنشانی padding و ارتفاع
-      card.classList.remove('p-1','min-h-10','md:min-h-28','p-4','min-h-0','md:min-h-20','gap-2','gap-0.5','hover:-translate-y-0.5','hover:-translate-y-0');
+      card.classList.remove('sm:grid-cols-5','sm:grid-cols-3','sm:grid-cols-2' ,'lg:grid-cols-3', 'lg:grid-cols-5');
        if (compact) {
-        card.classList.add( 'gap-0.5','min-h-0]','md:min-h-20','hover:-translate-y-0','leading-none');  
+        card.classList.add( 'sm:grid-cols-5', 'lg:grid-cols-5');  
       } else {
-        card.classList.add('p-3','min-h-10','md:min-h-28','hover:-translate-y-0.5','gap-2');
+        card.classList.add('sm:grid-cols-3','lg:grid-cols-3');
       }
+      const title =
+        card.querySelector('h3');
 
-      // بقیه ویژگی‌ها
-      card.classList.toggle('flex-col', true);
-      card.classList.toggle('items-center', compact);
-      card.classList.toggle('justify-center', compact);
-      card.classList.toggle('text-center', compact);
+// نمونه: لاگ‌گرفتن اجزای کارت اول
+    const desc =
+      card.querySelector('.desc') ||
+      card.querySelector('p.desc');
+  
 
-
-
-
-      // متن‌ها
-      if (title) {
-        title.classList.toggle('text-sm', compact);   // فونت ریزتر
-        title.classList.toggle('text-base', !compact);
-      }
-      if (desc) {
-        desc.style.display = compact ? 'none' : '';   // توضیح پنهان شود
-      }
+    if (title) {
+      title.classList.toggle('text-text-base', isCompact);
+      title.classList.toggle('text-base', !isCompact);
+      title.classList.toggle('leading-none', isCompact);
+    }
+    if (desc) {
+      desc.style.display = isCompact ? 'none' : '';
+    }
+  const grid = document.getElementById('grid');
+  const cards = grid ? grid.querySelectorAll(':scope > *') : [];
+  cards.forEach(card => {
+    // اجزایی که می‌خوای در compact مخفی بشن
+    ['.desc', '.tags', '.url', '.about', '.shrink-0.w-9.h-9'].forEach(sel => {
+      const el = card.querySelector(sel);
+      if (el) el.style.display = compact ? 'none' : '';
     });
-
-    // دکمه تغییر حالت
-    btn.setAttribute('aria-checked', String(compact));
-    btn.textContent = compact ? 'Compact view: On' : 'Compact view: Off';
-    btn.title = compact ? 'Switch to full grid view' : 'Switch to compact icons';
-  }
-
-  // کلیک سوییچ
-  btn.addEventListener('click', ()=>{
-    const compact = btn.getAttribute('aria-checked') !== 'true';
-    setView(compact);
   });
 
-  // پیش‌فرض Grid
+
+// نمونهٔ استفاده:
+applyCompactToResults(true);  // جمع‌وجور
+// applyCompactToResults(false); // حالت کامل
+
+  });
+}
+
+
+  function setView(next){
+    compact = !!next;
+    grids.forEach(g => applyCompactToGrid(g, compact));
+    btn.setAttribute('aria-checked', String(compact));
+    btn.textContent = compact ? 'Compact view: On' : 'Compact view: Off';
+    btn.title = compact ? 'Switch to full grid view' : 'Switch to compact view';
+  }
+
+  // در دسترس گذاشتن برای render()
+  window.__applyCompact = () => grids.forEach(g => applyCompactToGrid(g, compact));
+  window.__isCompact = () => compact;
+
+  // کلیک دکمه
+  btn.addEventListener('click', ()=>{
+    setView(!compact);
+  });
+
+  // پیش‌فرض: Grid
   setView(false);
 })();
 </script>
-      <!-- Results info -->
-      <div id="resultInfo" class="text-xs text-slate-500 dark:text-slate-400 mb-2">—</div>
-      <!-- Links grid -->
-      <main id="grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></main>
+
+      
       <!-- Add new link -->
-      <section id="add" class="mt-10 glass rounded-2xl p-5 border border-slate-200/40 dark:border-white/5">
+      <section id="add" class="mt-10 glass rounded-2xl p-5 border border-neutral-700/40 dark:border-white/5">
         <h2 class="font-bold text-lg mb-3" data-i18n="addTitle">Add a link</h2>
         <form id="addForm" class="grid sm:grid-cols-2 gap-3">
-          <input name="title" required placeholder="Title" class="rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-4 py-3" />
-          <input name="url" required type="url" placeholder="URL (https://…)" class="rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-4 py-3" />
-          <input name="desc" placeholder="Short description" class="rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-4 py-3 sm:col-span-2" />
+          <input name="title" required placeholder="Title" class="rounded-xl bg-zinc-700 dark:bg-slate-900/60 border border-stone-500 hover:border-stone-800 dark:border-slate-800 px-4 py-3" />
+          <input name="url" required type="url" placeholder="URL (https://…)" class="rounded-xl bg-zinc-700 dark:bg-slate-900/60 border border-stone-500 hover:border-stone-800 dark:border-slate-800 px-4 py-3" />
+          <input name="desc" placeholder="Short description" class="rounded-xl bg-zinc-700 dark:bg-slate-900/60 border border-stone-500 hover:border-stone-800 dark:border-slate-800 px-4 py-3 sm:col-span-2" />
           <div class="sm:col-span-2 grid grid-cols-2 gap-3">
-            <select name="category" class="rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-4 py-3">
+            <select name="category" class="rounded-xl bg-zinc-700 dark:bg-slate-900/60 border border-stone-500 hover:border-stone-800 dark:border-slate-800 px-4 py-3">
               <option value="ai">AI / ML</option>
               <option value="data">Data / Viz</option>
               <option value="python">Python</option>
@@ -269,9 +292,9 @@
               <option value="tools">Tools</option>
               <option value="career">Career</option>
             </select>
-            <input name="tags" placeholder="Tags (comma‑separated)" class="rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-4 py-3" />
+            <input name="tags" placeholder="Tags (comma‑separated)" class="rounded-xl bg-zinc-700 dark:bg-slate-900/60 border border-stone-500 hover:border-stone-800 dark:border-slate-800 px-4 py-3" />
           </div>
-          <button class="smooth mt-1 sm:col-span-2 px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white">Save to LocalStorage</button>
+          <button class="smooth mt-1 sm:col-span-2 px-4 py-3 rounded-xl hover:border-zinc-700 bg-stone-500 hover:bg-stone-800 text-white">Save to LocalStorage</button>
         </form>
         <p class="text-xs text-slate-500 dark:text-slate-400 mt-3" id="storageNote">Data is stored in your browser. Use Export to back up JSON and keep it in Git.</p>
       </section>
@@ -299,31 +322,29 @@
       </section>
 
       <!-- Footer -->
-      <footer class="mt-10 text-center text-xs text-slate-500 dark:text-slate-400">
+      <footer class="mt-10 text-center text-xs text-slate-900 dark:text-slate-400">
         Designed for AI learners — Minimal, glassy, and keyboard‑friendly.
       </footer>
     </div>
 
     <!-- Card template & About modal -->
     <template id="cardTemplate">
-      <article class="card smooth rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 p-4 flex flex-col gap-3">
-        <div class="flex items-start justify-between gap-3">
-          <div class="min-w-0">
-            <h3 class="title font-bold leading-tight truncate"></h3>
-            <p class="desc text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mt-1"></p>
-          </div>
-          <div class="shrink-0 w-9 h-9 rounded-xl grid place-items-center bg-slate-100 dark:bg-slate-800 text-lg">🔗</div>
-        </div>
-        <div class="flex flex-wrap gap-1 tags"></div>
-        <div class="flex items-center justify-between pt-2">
-          <a class="url smooth text-cyan-600 dark:text-cyan-400 hover:underline text-sm break-all" target="_blank" rel="noopener">Open ↗</a>
-          <div class="text-[10px] text-slate-500 dark:text-slate-400 domain"></div>
-        </div>
-        <div class="flex items-center justify-between">
-          <a class="about smooth text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 cursor-pointer">About</a>
-        </div>
-      </article>
-    </template>
+  <article class="card smooth rounded-2xl border border-neutral-700 hover:border-red-400 dark:border-red-950/80 bg-zinc-400/70 dark:bg-black/80 dark:hover:text-white hover:text-black hover:font-bold p-4 flex flex-col gap-3 cursor-pointer" tabindex="0">
+    <div class="flex items-start justify-between gap-3">
+      <div class="min-w-0">
+        <h3 class="title font-semibold leading-tight truncate"></h3>
+        <p class="desc text-sm text-slate-800 dark:text-slate-400 line-clamp-2 mt-1"></p>
+      </div>
+      <div class="shrink-0 w-9 h-9 rounded-xl grid place-items-center bg-zinc-400/70 dark:bg-slate-800 text-lg">🔗</div>
+    </div>
+    <div class="flex flex-wrap gap-1 tags"></div>
+    <div class="flex items-center justify-between pt-1">
+      <div class="smooth text-[10px] text-slate-600 dark:text-sky-800 hover:text-slate-700 dark:hover:text-slate-300  domain"></div>
+      <a class="about smooth text-[10px] text-slate-600 hover:text-slate-700 dark:hover:text-slate-300 cursor-pointer">About</a>
+    </div>
+  </article>
+</template>
+
 
     <div id="aboutModal" class="modal">
       <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 max-w-2xl w-[92%] p-6">
@@ -561,21 +582,60 @@
 
         for (const item of filtered){
           const node = cardTpl.content.cloneNode(true);
-          const title = $('.title', node);
-          const desc = $('.desc', node);
-          const url = $('.url', node);
-          const tags = $('.tags', node);
-          const domain = $('.domain', node);
-          const about = $('.about', node);
+          const cardEl = node.querySelector('article.card');
+          const title = node.querySelector('.title');
+          const desc = node.querySelector('.desc');
+          const tags = node.querySelector('.tags');
+          const domain = node.querySelector('.domain');
+          const about = node.querySelector('.about');
+
+          // متن‌ها
           title.textContent = item.title;
           desc.textContent = item.desc || '';
-          url.href = item.url; url.title = item.url; url.textContent = (dict.open||'Open') + ' ↗';
           domain.textContent = formatDomain(item.url);
-          about.textContent = dict.about;
-          (item.tags||[]).forEach(t=>{ const span=document.createElement('span'); span.textContent='#'+t; span.className='pill bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'; span.addEventListener('click',()=>{ $('#search').value=`tag:${t}`; state.query=`tag:${t}`; setHash({q:state.query}); render();}); tags.appendChild(span); });
-          about.addEventListener('click',()=>openAbout(item));
-          grid.appendChild(node);
-        }
+
+  // برچسب‌ها
+  (item.tags||[]).forEach(t=>{
+    const span=document.createElement('span');
+    span.textContent='#'+t;
+    span.className='pill bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
+    span.addEventListener('click', (ev)=>{
+      ev.stopPropagation();
+      $('#search').value=`tag:${t}`;
+      state.query=`tag:${t}`;
+      setHash({q:state.query});
+      render();
+    });
+    tags.appendChild(span);
+  });
+
+  // کلیک‌پذیری کل کارت
+  cardEl.classList.add('cursor-pointer'); // برای UX
+  cardEl.addEventListener('click', ()=>{
+    window.open(item.url, '_blank', 'noopener');
+  });
+  cardEl.addEventListener('keydown', (e)=>{
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      window.open(item.url, '_blank', 'noopener');
+    }
+  });
+
+  // About
+  about.addEventListener('click', (ev)=>{
+    ev.stopPropagation();
+    openAbout(item);
+  });
+if (window.__compactReapply) window.__compactReapply();
+
+  grid.appendChild(node);
+}
+
+// بعد از ساخت کارت‌ها، اگر حالت compact فعاله، دوباره اعمالش کن
+if (window.__isCompact && window.__isCompact() && window.__applyCompact) {
+  window.__applyCompact();
+}
+
         $('#resultInfo').textContent = (dict.count||I18N.en.count)(filtered.length, activeCat, state.query);
 
         
