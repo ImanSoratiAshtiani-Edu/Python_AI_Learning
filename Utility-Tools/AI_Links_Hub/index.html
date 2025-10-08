@@ -105,61 +105,154 @@
         <div class="mt-3 text-xs text-slate-500 dark:text-slate-400" id="searchHelp">Tip: Combine text + operators like <code class="px-1 rounded bg-slate-200/60 dark:bg-slate-800">deep-learning tag:vision site:arxiv.org</code></div>
       </section>
 
-      <!-- Featured (new) -->
+<!-- Featured (new) -->
 <section id="featured" class="mt-8">
-  <h2 class="text-lg font-bold mb-3" data-i18n="featuredTitle">Featured</h2>
-  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="text-lg font-bold" data-i18n="featuredTitle">Usefull Links</h2>
+
+    <!-- View switch -->
+    <button id="viewToggle"
+            class="px-3 py-1.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
+            role="switch" aria-checked="false" title="Switch to list view">
+      List view: Off
+    </button>
+  </div>
+
+  <!-- Cards container (default: Grid) -->
+  <div id="featuredCards" class="grid gap-2 sm:grid-cols-2 lg:grid-cols-5" data-view="grid">
+
     <!-- Google Colab -->
-    <article class="card smooth rounded-2xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-2">
+    <a href="https://colab.research.google.com" target="_blank" rel="noopener"
+       class="block rounded-2xl border border-slate-200 dark:border-slate-800 p-4
+              bg-white/70 dark:bg-slate-900/60 backdrop-blur
+              transition hover:shadow-lg hover:-translate-y-0.5 group
+              flex flex-col gap-2 min-h-12 md:min-h-20">
       <div class="flex items-center justify-between">
         <h3 class="font-bold">Google Colab</h3>
-        <span class="badge">Platform</span>
       </div>
-      <p class="text-sm text-slate-600 dark:text-slate-300">Run notebooks in the cloud with GPUs.</p>
-      <a href="https://colab.research.google.com" target="_blank" rel="noopener"
-         class="text-cyan-600 dark:text-cyan-400 hover:underline text-sm">Open ↗</a>
-    </article>
+      <p class="text-xs text-slate-600 dark:text-slate-300">Run notebooks in the cloud with GPUs</p>
+    </a>
+
+    <!-- Google Drive -->
+    <a href="https://drive.google.com/drive/u/0/home" target="_blank" rel="noopener"
+       class="block rounded-2xl border border-slate-200 dark:border-slate-800 p-4
+              bg-white/70 dark:bg-slate-900/60 backdrop-blur
+              transition hover:shadow-lg hover:-translate-y-0.5 group
+              flex flex-col gap-2 min-h-10 md:min-h-20">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold">Google Drive</h3>
+      </div>
+      <p class="text-xs text-slate-600 dark:text-slate-300">My Google Drive</p>
+    </a>
 
     <!-- GitHub -->
-    <article class="card smooth rounded-2xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-2">
+    <a href="https://github.com" target="_blank" rel="noopener"
+       class="block rounded-2xl border border-slate-200 dark:border-slate-800 p-4
+              bg-white/70 dark:bg-slate-900/60 backdrop-blur
+              transition hover:shadow-lg hover:-translate-y-0.5 group
+              flex flex-col gap-2 min-h-10 md:min-h-20">
       <div class="flex items-center justify-between">
         <h3 class="font-bold">GitHub</h3>
-        <span class="badge">Platform</span>
       </div>
-      <p class="text-sm text-slate-600 dark:text-slate-300">Host code, branches, and GitHub Pages.</p>
-      <a href="https://github.com" target="_blank" rel="noopener"
-         class="text-cyan-600 dark:text-cyan-400 hover:underline text-sm">Open ↗</a>
-    </article>
+      <p class="text-xs text-slate-600 dark:text-slate-300">Host code, branches, and GitHub Pages</p>
+    </a>
 
     <!-- Books List (from books.json) -->
-    <article id="featured-books" class="card smooth rounded-2xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-2 cursor-pointer">
+    <button id="featured-books"
+            class="block w-full text-left rounded-2xl border border-slate-200 dark:border-slate-800 p-4
+                   bg-white/70 dark:bg-slate-900/60 backdrop-blur cursor-pointer
+                   transition hover:shadow-lg hover:-translate-y-0.5
+                   flex flex-col gap-2 min-h-10 md:min-h-20">
       <div class="flex items-center justify-between">
         <h3 class="font-bold">Books List</h3>
-        <span class="badge">JSON</span>
+        <span class="badge text-xs px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">JSON</span>
       </div>
-      <p class="text-sm text-slate-600 dark:text-slate-300">Browse curated books (from books.json).</p>
-      <button class="text-cyan-600 dark:text-cyan-400 hover:underline text-sm text-left">Open list</button>
-    </article>
+      <p class="text-xs text-slate-600 dark:text-slate-300">List of useful books</p>
+    </button>
 
     <!-- Ebooks (from ebooks.json) -->
-    <article id="featured-ebooks" class="card smooth rounded-2xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-2 cursor-pointer">
+    <button id="featured-ebooks"
+            class="block w-full text-left rounded-2xl border border-slate-200 dark:border-slate-800 p-4
+                   bg-white/70 dark:bg-slate-900/60 backdrop-blur cursor-pointer
+                   transition hover:shadow-lg hover:-translate-y-0.5
+                   flex flex-col gap-2 min-h-10 md:min-h-20">
       <div class="flex items-center justify-between">
         <h3 class="font-bold">Ebooks</h3>
-        <span class="badge">JSON</span>
+        <span class="badge text-xs px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">JSON</span>
       </div>
-      <p class="text-sm text-slate-600 dark:text-slate-300">Open PDFs with rich metadata (from ebooks.json).</p>
-      <button class="text-cyan-600 dark:text-cyan-400 hover:underline text-sm text-left">Open list</button>
-    </article>
+      <p class="text-xs text-slate-600 dark:text-slate-300">Open PDFs</p>
+    </button>
   </div>
 </section>
+<script>
+(function(){
+  const btn = document.getElementById('viewToggle');
+  const grid = document.getElementById('featuredCards');
+  if(!btn || !grid) return;
+
+  function setView(compact){
+    grid.dataset.view = compact ? 'compact' : 'grid';
+
+    // container style
+    grid.classList.toggle('grid', true);
+    grid.classList.toggle('gap-1.5', compact);    // فاصله کمتر بین کارت‌ها
+    grid.classList.toggle('gap-2', !compact);
+    grid.classList.toggle('sm:grid-cols-2', !compact);
+    grid.classList.toggle('sm:grid-cols-5', compact);
+    grid.classList.toggle('lg:grid-cols-5', !compact);
+
+    // cards
+    [...grid.children].forEach(card => {
+      const title = card.querySelector('h3');
+      const desc = card.querySelector('p');
+    
+      // بازنشانی padding و ارتفاع
+      card.classList.remove('p-1','min-h-10','md:min-h-28','p-4','min-h-0','md:min-h-20','gap-2','gap-0.5','hover:-translate-y-0.5','hover:-translate-y-0');
+       if (compact) {
+        card.classList.add( 'gap-0.5','min-h-0]','md:min-h-20','hover:-translate-y-0','leading-none');  
+      } else {
+        card.classList.add('p-3','min-h-10','md:min-h-28','hover:-translate-y-0.5','gap-2');
+      }
+
+      // بقیه ویژگی‌ها
+      card.classList.toggle('flex-col', true);
+      card.classList.toggle('items-center', compact);
+      card.classList.toggle('justify-center', compact);
+      card.classList.toggle('text-center', compact);
 
 
+
+
+      // متن‌ها
+      if (title) {
+        title.classList.toggle('text-sm', compact);   // فونت ریزتر
+        title.classList.toggle('text-base', !compact);
+      }
+      if (desc) {
+        desc.style.display = compact ? 'none' : '';   // توضیح پنهان شود
+      }
+    });
+
+    // دکمه تغییر حالت
+    btn.setAttribute('aria-checked', String(compact));
+    btn.textContent = compact ? 'Compact view: On' : 'Compact view: Off';
+    btn.title = compact ? 'Switch to full grid view' : 'Switch to compact icons';
+  }
+
+  // کلیک سوییچ
+  btn.addEventListener('click', ()=>{
+    const compact = btn.getAttribute('aria-checked') !== 'true';
+    setView(compact);
+  });
+
+  // پیش‌فرض Grid
+  setView(false);
+})();
+</script>
       <!-- Results info -->
       <div id="resultInfo" class="text-xs text-slate-500 dark:text-slate-400 mb-2">—</div>
-
       <!-- Links grid -->
       <main id="grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></main>
-
       <!-- Add new link -->
       <section id="add" class="mt-10 glass rounded-2xl p-5 border border-slate-200/40 dark:border-white/5">
         <h2 class="font-bold text-lg mb-3" data-i18n="addTitle">Add a link</h2>
